@@ -1,0 +1,33 @@
+{
+ "gate": "behavioral-equivalence",
+ "status": "PASS",
+ "fixture": {
+  "source": "official train split of LocalLLaMA/typed-decisions, first 30 cases per workflow by sorted id (not redistributed: it consists of dataset rows)",
+  "sha256": "c4e143fb88ed83834d804ebb89c19e8942c7f5fc3683ed11304a3ab466ed6113",
+  "cases": 120,
+  "decisions": 600,
+  "by_primitive": {
+   "noul": 180,
+   "choice": 180,
+   "score": 240
+  }
+ },
+ "comparison": {
+  "predicted_class_mismatches": 0,
+  "max_abs_probability_difference": 0.0,
+  "max_abs_expected_score_difference": 0.0,
+  "decisions_bit_identical": 600,
+  "tolerance_preregistered": 1e-09,
+  "classes": "exact equality required"
+ },
+ "descriptor": {
+  "internal_ensemble_json_sha256": "df9a602b968ce8ac32d519c6a41a3ffeb25dfb5e019708219d6c87cbaec74d7f",
+  "public_ensemble_json_sha256": "368f8eca1186cc8c68cc3bb320cf4fb22b26205b800f22fb8d2e1952b81e120f",
+  "reason_for_difference": "the public descriptor omits the two informational fields of the frozen one (training run identifiers and their directories); `Ensemble.load` reads only kind, dir and weight",
+  "all_other_model_files": "byte-identical to the internal frozen release; every model file is listed with its hash in PROVENANCE.json and SHA256SUMS"
+ },
+ "sides": {
+  "internal": "the internal frozen package and its private inference code",
+  "public": "the exported runtime as the only importable package, on the exported model/"
+ }
+}

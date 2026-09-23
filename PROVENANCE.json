@@ -1,0 +1,173 @@
+{
+ "release": "primus-decision-0.1",
+ "model_id": "primus-decision-0.1",
+ "version": "0.1.0",
+ "positioning": "The first trained model component of Primus: a non-transformer typed-decision research model.",
+ "frozen_utc": "2026-09-22T06:22:58Z",
+ "sealed_evaluation_utc": "2026-09-22T06:32:28Z",
+ "artifacts": {
+  "model/calibration.json": {
+   "sha256": "d47112d2aaefea14f903dcac0c43b05cbf11554a556c7bd736ca28039ac2345a",
+   "bytes": 318
+  },
+  "model/ensemble.json": {
+   "sha256": "368f8eca1186cc8c68cc3bb320cf4fb22b26205b800f22fb8d2e1952b81e120f",
+   "bytes": 219,
+   "frozen_descriptor_sha256": "df9a602b968ce8ac32d519c6a41a3ffeb25dfb5e019708219d6c87cbaec74d7f",
+   "note": "the released descriptor omits the two informational fields of the frozen one; the loader reads only kind, dir and weight"
+  },
+  "model/member0/calibration.json": {
+   "sha256": "545a7463056715d128e40513d31bed57c7d26d005f49aa547acdffb9d120ecdb",
+   "bytes": 313
+  },
+  "model/member0/config.json": {
+   "sha256": "00c05d2cc8e7b72941a9b622acb286653c5777972b06836651178b77452e44f7",
+   "bytes": 2983
+  },
+  "model/member0/lsa.pkl": {
+   "sha256": "9c4349c22f3826e33c3576c6c54bd3491aef340bafd3ba52b7866f4fe38b56d4",
+   "bytes": 71413743
+  },
+  "model/member0/model.safetensors": {
+   "sha256": "2a6548592d64247bbd4df9575b5bef48b45826fa7b3e46cdc1a4c92358796ce5",
+   "bytes": 7735780
+  },
+  "model/member0/vocab.json": {
+   "sha256": "74751b695d116c28604d2d29ac60b5f4797df0150d31c452689e276da535d71c",
+   "bytes": 27090
+  },
+  "model/member1/calibration.json": {
+   "sha256": "7f19015d029b45cbbf85265af0f58711e9b1c99523c2672cb9c9205a819e41f6",
+   "bytes": 315
+  },
+  "model/member1/config.json": {
+   "sha256": "46b4438e6f445cd199d92df6bec6f863bf3d6fcd06e124b4ff0b500b0711e91a",
+   "bytes": 2954
+  },
+  "model/member1/lsa.pkl": {
+   "sha256": "a5b4826595bca5c77f5679156a59fd32db64b608b13547ba66dbb0498720ae96",
+   "bytes": 71413743
+  },
+  "model/member1/model.safetensors": {
+   "sha256": "db4224e04800a15194360dd25879773f1aef0ae8487368b031145af1125e4c5e",
+   "bytes": 7133084
+  },
+  "model/member1/vocab.json": {
+   "sha256": "74751b695d116c28604d2d29ac60b5f4797df0150d31c452689e276da535d71c",
+   "bytes": 27090
+  }
+ },
+ "dataset": {
+  "name": "LocalLLaMA/typed-decisions",
+  "url": "https://huggingface.co/datasets/LocalLLaMA/typed-decisions",
+  "revision": "ea9306458d6e9563628369a3d1e72e362fb381d2",
+  "license": "Apache-2.0",
+  "train_validation_rule": "sha256(case_id) mod 100 < 20 is validation (195 cases), the rest is training (1,005 cases); no seed, no shuffling",
+  "official_train": {
+   "cases": 1200,
+   "decisions": 6000
+  },
+  "official_test": {
+   "cases": 400,
+   "decisions": 2000,
+   "read": "exactly once, after the freeze"
+  },
+  "manifest_sha256": "4752590be05d1f40be378eb21cd0b42b75877b2b5262eddf59892f93c2cc02d1",
+  "files": {
+   "all/train-00000-of-00001.parquet": {
+    "sha256": "46a58d63edfd86e23229c78afe8b72307bb4ca9fb0e8df180cabb3c67ec9dcd5",
+    "bytes": 598824
+   },
+   "all/test-00000-of-00001.parquet": {
+    "sha256": "4f294f218ea1da27f3efef936359389c62ea4d3973a41457732990f1d31b647c",
+    "bytes": 222140
+   }
+  }
+ },
+ "training": {
+  "members": [
+   {
+    "dir": "member0",
+    "encoder": "s4d",
+    "encoder_description": "2 diagonal state-space (S4D) blocks per direction, 16 states per channel",
+    "seed": 2,
+    "parameters": 1932609
+   },
+   {
+    "dir": "member1",
+    "encoder": "gru",
+    "encoder_description": "2 bidirectional GRU layers",
+    "seed": 1,
+    "parameters": 1782465
+   }
+  ],
+  "shared_hyper_parameters": {
+   "d_emb": 128,
+   "d_model": 192,
+   "n_layers": 2,
+   "n_state": 16,
+   "n_heads": 4,
+   "dropout": 0.3,
+   "max_len": 640,
+   "lsa_dims": 256,
+   "batch_cases": 16,
+   "max_epochs": 40,
+   "early_stopping": "patience 8 on validation soft cross-entropy; the best epoch's weights are kept",
+   "optimizer": "AdamW, lr 0.002, weight decay 0.0001, gradient norm clipped at 1.0",
+   "lr_schedule": "halved after 3 epochs without validation improvement",
+   "loss": "soft cross-entropy against the gold distribution plus 0.5 x Brier",
+   "lsa_featurizer": "word 1-2-gram and char 3-5-gram TF-IDF, truncated SVD to 256 dims, fitted on the training part only",
+   "calibration": "temperature per (question type, option count), fitted on the validation part only, applied on request"
+  },
+  "ensemble": {
+   "method": "weighted probability average",
+   "weights": [
+    0.5,
+    0.5
+   ],
+   "selection": "lowest validation NLL on raw probabilities over a 0.1-step weight grid"
+  },
+  "total_parameters": 3715074,
+  "training_code": "not part of this release; the runtime's nn.py and data.py are the model definition and text pipeline it used"
+ },
+ "validation": {
+  "cases": 195,
+  "decisions": 975,
+  "raw": {
+   "n": 975,
+   "accuracy": 0.7794871794871795,
+   "soft_accuracy": 0.5715742859876666,
+   "brier": 0.0568414640203161,
+   "kl": 0.09621510539038669,
+   "tv": 0.13469433735019398,
+   "nll": 0.6151981294732647,
+   "ece": 0.15586777678145233,
+   "score_mae": 0.25322328538481276,
+   "within_1": 0.9871794871794872
+  },
+  "calibrated": {
+   "n": 975,
+   "accuracy": 0.7794871794871795,
+   "soft_accuracy": 0.6298952959860269,
+   "brier": 0.10202024378273286,
+   "kl": 0.258887609119611,
+   "tv": 0.18956761948205716,
+   "nll": 0.5114342807608788,
+   "ece": 0.02542624040374013,
+   "score_mae": 0.2849959919180245,
+   "within_1": 0.9769230769230769
+  },
+  "note": "validation numbers guided model selection and calibration and are therefore optimistic; quote the sealed test numbers"
+ },
+ "environment": {
+  "python": "3.11.15",
+  "platform": "Linux x86_64, glibc 2.39",
+  "machine": "x86_64",
+  "cpu_count": 4,
+  "torch": "2.14.0+cpu",
+  "torch_threads": 2,
+  "cuda": false,
+  "numpy": "2.4.6",
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz"
+ }
+}

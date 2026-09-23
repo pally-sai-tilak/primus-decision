@@ -1,0 +1,43 @@
+# Primus Decision 0.1 — model manifest (public research alpha)
+name = "primus-decision-0.1"
+version = "0.1.0"
+kind = "research-alpha"
+public = true
+positioning = "The first trained model component of Primus: a non-transformer typed-decision research model."
+model_id = "primus-decision-0.1"
+architecture = "ensemble-s4d-gru: weighted probability average of [w=0.50] token embeddings -> 2x diagonal state-space (S4D) blocks + 256-d LSA case features -> additive attention pooling -> option scorer; [w=0.50] token embeddings -> 2x bidirectional GRU + 256-d LSA case features -> additive attention pooling -> option scorer"
+native_transformer = false
+parameters = 3715074
+input_schema = "schemas/request.schema.json"
+action_schema = "schemas/response.schema.json (noul | choice | score distributions)"
+decision_history_schema = "schemas/decision_history.schema.json"
+interface = "INTERFACE.md"
+dataset = "LocalLLaMA/typed-decisions @ ea9306458d6e9563628369a3d1e72e362fb381d2 (official train split only)"
+dataset_manifest_sha256 = "4752590be05d1f40be378eb21cd0b42b75877b2b5262eddf59892f93c2cc02d1"
+frozen_utc = "2026-09-22T06:22:58Z"
+sealed_utc = "2026-09-22T06:32:28Z"
+weights_sha256 = "368f8eca1186cc8c68cc3bb320cf4fb22b26205b800f22fb8d2e1952b81e120f"
+weights_sha256_is = "sha256 of model/ensemble.json, the descriptor that names the member weights; every file's hash is in SHA256SUMS and PROVENANCE.json"
+member0_weights_sha256 = "2a6548592d64247bbd4df9575b5bef48b45826fa7b3e46cdc1a4c92358796ce5"
+member1_weights_sha256 = "db4224e04800a15194360dd25879773f1aef0ae8487368b031145af1125e4c5e"
+default_output = "raw probabilities (calibrated=False)"
+calibration_profile = "model/calibration.json — EXPERIMENTAL temperature per (type, option count), fitted on validation split only; not applied by default"
+sealed_run_index = 1
+sealed_test_sha256 = "4f294f218ea1da27f3efef936359389c62ea4d3973a41457732990f1d31b647c"
+sealed_raw_accuracy = 0.7510
+sealed_raw_brier = 0.0591
+sealed_raw_ece = 0.1272
+sealed_score_mae = 0.2747
+laya_reference_accuracy = 0.766
+primary_gate = "FAIL"
+secondary_gate = "PASS"
+release_gate = "FAIL"
+claim = "NO claim of superiority over Laya or any other system; research alpha with the exact gap stated"
+public_boundary = "PUBLIC_BOUNDARY.md"
+provenance = "PROVENANCE.json"
+large_files = ["model/member0/lsa.pkl", "model/member1/lsa.pkl"]
+large_files_storage = "Git LFS pointer files in the repository (pointer oid = SHA-256 of the real bytes, also listed in SHA256SUMS); `git lfs pull` fetches them"
+license = "Apache-2.0"
+license_scope = "the Primus Decision 0.1 model artifacts, minimal runtime and documentation in this repository only; other Primus components are licensed separately"
+trademarks = "Primus, Primus AI, AAME and associated logos are trademarks of Pally Sai Tilak / AAME; not licensed (Apache-2.0 §6)"
+dataset_license = "Apache-2.0 (LocalLLaMA/typed-decisions); no dataset rows included"

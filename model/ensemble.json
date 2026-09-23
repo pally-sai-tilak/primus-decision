@@ -1,0 +1,15 @@
+{
+  "method": "weighted probability average",
+  "members": [
+    {
+      "kind": "nn",
+      "weight": 0.5,
+      "dir": "member0"
+    },
+    {
+      "kind": "nn",
+      "weight": 0.5,
+      "dir": "member1"
+    }
+  ]
+}

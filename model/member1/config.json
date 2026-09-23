@@ -1,0 +1,147 @@
+{
+  "encoder": "gru",
+  "vocab_size": 4819,
+  "d_emb": 128,
+  "d_model": 192,
+  "n_layers": 2,
+  "n_state": 16,
+  "n_heads": 4,
+  "dropout": 0.3,
+  "max_len": 640,
+  "lsa_dims": 256,
+  "schemas": [
+    "agent_trace_observability/action",
+    "agent_trace_observability/needs_review",
+    "agent_trace_observability/outcome",
+    "agent_trace_observability/risk",
+    "agent_trace_observability/urgency",
+    "customer_service/action",
+    "customer_service/category",
+    "customer_service/churn_risk",
+    "customer_service/needs_human",
+    "customer_service/urgency",
+    "invoice_processing/discrepancy_severity",
+    "invoice_processing/disposition",
+    "invoice_processing/duplicate",
+    "invoice_processing/matches_order",
+    "invoice_processing/urgency",
+    "security_incidents/credential_compromise",
+    "security_incidents/disposition",
+    "security_incidents/severity",
+    "security_incidents/true_positive",
+    "security_incidents/urgency"
+  ],
+  "schema_options": {
+    "agent_trace_observability/action": [
+      "continue",
+      "human_review",
+      "observe",
+      "stop"
+    ],
+    "agent_trace_observability/needs_review": [
+      "false",
+      "true"
+    ],
+    "agent_trace_observability/outcome": [
+      "failure",
+      "harmful",
+      "partial",
+      "success"
+    ],
+    "agent_trace_observability/risk": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "agent_trace_observability/urgency": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "customer_service/action": [
+      "answer_directly",
+      "close_no_action",
+      "escalate_to_human",
+      "execute_refund",
+      "request_information"
+    ],
+    "customer_service/category": [
+      "account",
+      "billing",
+      "delivery",
+      "refund",
+      "technical"
+    ],
+    "customer_service/churn_risk": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "customer_service/needs_human": [
+      "false",
+      "true"
+    ],
+    "customer_service/urgency": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "invoice_processing/discrepancy_severity": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "invoice_processing/disposition": [
+      "approve",
+      "hold",
+      "manual_review",
+      "reject"
+    ],
+    "invoice_processing/duplicate": [
+      "false",
+      "true"
+    ],
+    "invoice_processing/matches_order": [
+      "false",
+      "true"
+    ],
+    "invoice_processing/urgency": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ],
+    "security_incidents/credential_compromise": [
+      "false",
+      "true"
+    ],
+    "security_incidents/disposition": [
+      "close_benign",
+      "contain",
+      "investigate",
+      "monitor"
+    ],
+    "security_incidents/severity": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "security_incidents/true_positive": [
+      "false",
+      "true"
+    ],
+    "security_incidents/urgency": [
+      "0",
+      "1",
+      "2",
+      "3"
+    ]
+  }
+}

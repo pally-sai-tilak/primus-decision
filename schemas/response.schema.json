@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Primus Decision response",
+  "description": "Either `answers`, one entry per question id of the request, or `error`, a one-line description of why the request could not be answered. Probabilities are aligned with the option keys of the request: for noul the keys are \"false\" and \"true\"; for choice the keys of `criteria`; for score the level indices \"0\" … \"n-1\" as strings. They sum to 1 within floating-point rounding.",
+  "type": "object",
+  "anyOf": [
+    {"required": ["answers"]},
+    {"required": ["error"]}
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "answers": {"type": "object", "additionalProperties": {"$ref": "#/$defs/answer"}},
+    "error": {"type": "string"}
+  },
+  "$defs": {
+    "answer": {
+      "type": "object",
+      "required": ["type", "probabilities", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"enum": ["noul", "choice", "score"]},
+        "probabilities": {"type": "object", "minProperties": 2, "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1, "description": "the largest probability"},
+        "noul": {"type": "number", "minimum": 0, "maximum": 1, "description": "noul only: probability that the statement is true"},
+        "choice": {"type": "string", "description": "choice only: the option key with the largest probability"},
+        "score": {"type": "number", "minimum": 0, "description": "score only: the expected level, Σ level × probability"}
+      }
+    }
+  }
+}

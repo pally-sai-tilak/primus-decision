@@ -1,0 +1,24 @@
+Primus Decision 0.1 — Research Alpha
+Copyright 2026 Pally Sai Tilak / AAME
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use the files in this
+repository except in compliance with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed under the License
+is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied. See the License for the specific language governing permissions and limitations.
+
+Scope of the license. The Apache License applies to the Primus Decision 0.1 model artifacts
+(weights, featurizers, configurations, calibration profiles), the minimal inference runtime and the
+documentation in this repository, and to nothing else. Other Primus components, past or future, are
+licensed separately and do not inherit this license.
+
+Trademarks. "Primus", "Primus AI", "AAME" and the associated logos and branding are trademarks of
+Pally Sai Tilak / AAME. The Apache License does not grant permission to use these names, logos or
+branding (Section 6 of the License), except as required for reasonable and customary use in
+describing the origin of the work.
+
+Third-party material. The benchmark dataset (Apache-2.0) and the software dependencies are licensed
+by their owners; see THIRD_PARTY.md. No dataset rows are included in this repository.

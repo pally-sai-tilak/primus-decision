@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Primus Decision request",
+  "description": "One request answers every question in `questions` about one `state`. Questions are identified by workflow and question id; the released model answers the 20 benchmark schemas listed under `schemas` in model/member0/config.json and rejects any other (workflow, qid) pair.",
+  "type": "object",
+  "required": ["state", "questions"],
+  "additionalProperties": false,
+  "properties": {
+    "workflow": {"type": ["string", "null"], "description": "workflow name, e.g. invoice_processing; null or absent means the empty workflow"},
+    "state": {"type": ["object", "string"], "description": "the JSON state the questions are about; a string is used as raw text"},
+    "questions": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/question"}, "description": "question id → question"},
+    "calibrated": {"type": "boolean", "default": false, "description": "apply the temperature profile in model/calibration.json; off by default"}
+  },
+  "$defs": {
+    "question": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"enum": ["noul", "choice", "score"]},
+        "instructions": {"type": "string", "default": "", "description": "the question text shown to the model as a bag of words"},
+        "criteria": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "object", "additionalProperties": {"type": "string"}, "description": "choice: option key → option text, in the order the options are scored; noul: optional {\"false\": text, \"true\": text}"},
+            {"type": "array", "minItems": 2, "items": {"type": "string"}, "description": "score: one text per level, level 0 first"}
+          ],
+          "description": "null for noul (options are false/true); an object for choice; an array for score"
+        }
+      }
+    }
+  }
+}

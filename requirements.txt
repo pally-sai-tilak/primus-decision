@@ -1,0 +1,6 @@
+# Primus Decision 0.1 — Research Alpha: runtime dependencies (versions of the recorded training / sealed runs)
+torch==2.14.0
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.9.1
+safetensors==0.8.0

@@ -1,0 +1,12 @@
+{
+  "method": "temperature_per_type_and_option_count",
+  "fitted_on": "validation split only",
+  "temperatures": {
+    "choice/4": 0.42533358047542785,
+    "noul/2": 0.5116869459983874,
+    "score/4": 0.4454493590701697,
+    "choice/5": 0.5877739531418044,
+    "score/5": 0.3789291416275995
+  },
+  "fallback": 1.0
+}

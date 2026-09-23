@@ -1,0 +1,40 @@
+name: verify
+
+# Verifies the release as shipped: checksums, dependencies, one real inference and the JSON-lines bridge.
+# The two featurizers are Git LFS objects; they are fetched once and cached by the checksum manifest so that reruns
+# do not spend LFS bandwidth. Runs on pushes to main and on demand.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: cache the LFS featurizers
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('SHA256SUMS') }}
+      - name: fetch the featurizers
+        run: |
+          git lfs install --local
+          git lfs pull
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: verify every file against SHA256SUMS
+        run: sha256sum -c SHA256SUMS
+      - name: install the pinned CPU dependencies
+        run: python -m pip install -r requirements.txt --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple
+      - name: one real inference from the packaged bytes
+        run: python examples/predict_example.py
+      - name: the JSON-lines bridge answers a request
+        run: |
+          printf '%s\n' '{"workflow": "invoice_processing", "state": {"invoice": {"amount_usd": 1200.0, "po_amount_usd": 1000.0}}, "questions": {"duplicate": {"type": "noul", "instructions": "Is this invoice a duplicate of one already paid?"}}}' \
+            | python -m primus_decision.serve model | tee bridge.out
+          grep -q '"answers"' bridge.out

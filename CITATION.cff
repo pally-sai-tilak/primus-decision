@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use Primus Decision 0.1 in your work, please cite it as below."
+type: software
+title: "Primus Decision 0.1 (Research Alpha): an open 3.7M-parameter non-transformer model for typed probabilistic decisions"
+version: "0.1"
+date-released: "2026-09-23"
+license: Apache-2.0
+repository-code: "https://github.com/pally-sai-tilak/primus-decision"
+authors:
+  - family-names: "Pally"
+    given-names: "Sai Tilak"
+    affiliation: "AAME"
+  - name: "AAME"
+keywords:
+  - typed decisions
+  - probabilistic decisions
+  - calibration
+  - state-space model
+  - GRU
+  - CPU inference
+abstract: >-
+  Primus Decision 0.1 answers typed questions about a JSON state with probability distributions: whether a statement
+  is true, which of the offered options applies, which level on an ordinal scale. It is an ensemble of a diagonal
+  state-space (S4D) encoder and a bidirectional GRU with LSA case features, 3,715,074 neural parameters in total, run
+  on a CPU. On the official test split of LocalLLaMA/typed-decisions it reached accuracy 0.751, Brier 0.059 and ECE
+  0.127 in one sealed run after freezing; the Laya reference reaches accuracy 0.766 under the same protocol.
