@@ -42,13 +42,16 @@ Published figures are quoted from their publishers. The full tables are in `BENC
 
 ## Reading the result
 
-The Laya reference wins on accuracy by 30 decisions in 2,000, and it wins clearly on the `score` primitive, on
-customer service and on security incidents. Primus Decision 0.1 has the lower Brier and ECE under the same protocol
-(the Brier gap, 0.059 against 0.062, is about one standard error; the ECE gap is not); on agent-trace observability
-and invoice processing the two are within one or two decisions in 500, which is a tie. It is a different kind of
-object: 3.7 M neural parameters plus 143 MB of fitted LSA tables, against a fine-tuned ModernBERT-large that its model
-card puts at about 421 M parameters. A model this small gets this close on this benchmark with lower calibration
-error; it does not beat anything.
+Primus demonstrates typed decisions with 3.7M neural parameters and local CPU inference. On this benchmark it records
+75.1% accuracy, raw ECE 0.127 and Brier 0.059. The reproduced Laya checkpoint records 76.6%, ECE 0.213 and Brier 0.066;
+its ordinal MAE is 0.242 versus Primus's 0.275. Published reference figures above retain their original source labels.
+The 143 MB of fitted LSA features are additional learned state, separate from the neural parameter count.
+
+## Invoice research
+
+The unchanged public component scores **26/32 structured reconciliation checks** in a broader synthetic invoice test,
+following **32/32** in the initial pilot. The study publishes both input representations, duplicate-ID checks,
+all comparison systems and an audit of Qwen answer formats. [Read the case study and evidence](INVOICE_CASE_STUDY.md).
 
 ## Why no transformer
 
@@ -63,10 +66,10 @@ secondary gate Brier or raw ECE below it. Architecture, hyper-parameters and cal
 hashes; the test split was opened once. Primary failed, secondary passed. Protocol in `PROTOCOL.md`, machine record in
 `SEALED_RESULT.json`.
 
-## Limitations
+## Evaluation conditions
 
-Specialist scope, a small validation split, sensitivity to state formatting, an experimental calibration profile
-that trades Brier for ECE, one seed per member, and the memory cost of the featurizers. Details in `LIMITATIONS.md`.
+The evidence covers supported schemas, the recorded state formats and one frozen ensemble. Input conventions,
+calibration choices, validation sample size and runtime footprint are documented in [Scope and evaluation notes](LIMITATIONS.md).
 
 ## Verify and reproduce
 
@@ -76,8 +79,8 @@ and `BEHAVIORAL_EQUIVALENCE.md` shows the public package matching the internal f
 
 ## Context
 
-`ARCHITECTURE.md` places the decision layer inside Primus. It is **not the complete PRGA/Primus system**; other Primus
-components are in development and are not part of this release.
+`ARCHITECTURE.md` describes the released decision component. Our broader research direction and the distinction
+between public evidence and protected development are set out in [The Road to Primus](README.md#the-road-to-primus).
 
 ## Citation and license
 

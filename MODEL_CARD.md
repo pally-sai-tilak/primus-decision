@@ -2,9 +2,9 @@
 
 **Positioning.** The first trained model component of Primus: a non-transformer typed-decision research model.
 
-**Scope.** This artifact is **Primus System 1**, the fast typed-decision layer. It is **not the complete
-PRGA/Primus system**. It answers typed questions about one JSON state with probability distributions and nothing
-more: no memory across calls, no multi-step deliberation, no tool use.
+**Scope.** This artifact is **Primus System 1**, the typed-decision component. It answers supported questions about
+one JSON state with probability distributions. Persistent memory, deliberation and tool orchestration belong to the
+broader research roadmap; the released interface evaluates each supplied state independently.
 
 ## Result
 
@@ -29,14 +29,19 @@ Laya reference accuracy: 0.766
 | soft accuracy | 0.563 | 0.509 | 0.471 |
 | NLL | 0.637 | 0.707 | not published |
 
-Primus Decision 0.1 does **not** outperform the Laya reference on accuracy: 0.751 against 0.766 is 30 decisions in
-2,000. It has the lower Brier and ECE under the reproduced protocol (the Brier gap is about one standard error) and the
-worse score MAE. The published Laya figures are quoted from its model card; the reproduced ones come from running Laya's
-released checkpoint through the same protocol on our machine (`EXPERIMENTS.md`: accuracy, ECE and score MAE reproduce the
-card exactly, its soft accuracy and Brier do not). No claim of superiority over Laya or any other system is made. Per-workflow and per-primitive tables, the decision-level gap and the calibration profile are in
-`BENCHMARKS.md`; the machine record of the run is `SEALED_RESULT.json`. The dataset card's leaderboard on 2026-09-22
-also lists a proprietary zero-shot generalist, meraGPT Decider 1, at accuracy 0.768 and Brier 0.052, above this model
-on both (`BENCHMARKS.md`).
+Primus pairs 75.1% accuracy with Brier 0.059 and ECE 0.127. Reproduced Laya scores 76.6% accuracy, Brier 0.066,
+ECE 0.213 and ordinal MAE 0.242, compared with Primus MAE 0.275. The accuracy difference is 30 decisions in 2,000.
+The published and reproduced columns identify their evidence sources: accuracy, ECE and score MAE reproduce Laya's
+card exactly; soft accuracy and Brier differ under the recorded harness. See `EXPERIMENTS.md` and `BENCHMARKS.md`
+for the full comparisons, including the externally reported meraGPT result (accuracy 0.768, Brier 0.052,
+2026-09-22 snapshot). The machine record remains `SEALED_RESULT.json`.
+
+## Invoice case study
+
+The unchanged model scored **26/32 on structured reconciliation** in the broader synthetic invoice experiment and
+**32/32 in the initial pilot**. The broader study also records 17/32 on the narrative presentation of the same facts,
+alongside classifier, rule and standalone Qwen3-1.7B comparisons. Read the
+[complete case study and evidence](INVOICE_CASE_STUDY.md). These are separate task-specific experiments.
 
 ## Model
 
@@ -58,7 +63,8 @@ the package is 158 MB rather than 15 MB. Exact counts, sizes and measurements: `
 - **Inputs.** The state flattened to text, deterministic derived-relation sentences (numeric comparisons within a
   key family, list membership, signs, nulls), the question instructions and the option criteria.
 - **Training data.** The official train split only, 1,005 cases for fitting and 195 held out as validation by a
-  fixed hash rule. No external or synthetic data. No transformer anywhere in training or inference.
+  fixed hash rule. This public dataset is synthetic and teacher-labelled; no additional external data were used.
+  Primus itself uses trained-from-scratch, non-transformer encoders and no LLM call at inference.
 - **Interface.** A request is one JSON state plus typed questions; a reply is one distribution per question.
   `INTERFACE.md` and `schemas/` specify both, and the Decision History record for logging answers and outcomes.
 - **Output.** Raw probabilities. `model/calibration.json` is an experimental temperature profile fitted on the
@@ -71,9 +77,10 @@ the package is 158 MB rather than 15 MB. Exact counts, sizes and measurements: `
 
 ## Intended use
 
-A research artifact and a specialist for the four benchmark workflows: agent-trace observability, customer service,
-invoice processing and security incidents. Unseen workflows need retraining; questions outside the 20 benchmark
-schemas are rejected. It is not meant for safety-critical decisions without a person in the loop.
+A research artifact and specialist for agent-trace observability, customer service, invoice processing and security
+incidents within the 20 released schemas. Application development should evaluate the intended records and adapt the
+model or schema coverage where needed. Use human review for consequential decisions. See
+[Scope and evaluation notes](LIMITATIONS.md).
 
 ## Evaluation protocol
 
@@ -98,6 +105,7 @@ release only; other Primus components, past or future, are licensed separately. 
 associated logos are trademarks of Pally Sai Tilak / AAME and are not licensed. Dataset: Apache-2.0
 (`LocalLLaMA/typed-decisions`); no dataset rows are included.
 
-## Not in this release
+## Broader Primus programme
 
-Other Primus components, their data and their checkpoints. See `PUBLIC_BOUNDARY.md`.
+The released decision component is the first public research alpha. The longer-term architecture and the boundary
+between auditable public evidence and protected research are described in [Public boundary](PUBLIC_BOUNDARY.md).

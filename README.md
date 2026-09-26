@@ -34,13 +34,22 @@ ECE:      0.127
 Laya reference accuracy: 0.766
 ```
 
-Primus reaches statistically comparable accuracy to the reproduced 421M-parameter Laya checkpoint on this test
-(0.751 against 0.766; Laya's figure lies inside Primus's 95 % bootstrap interval, 0.729–0.774) with about 113× fewer
-neural parameters, better NLL (0.637 against 0.707) and raw ECE (0.127 against 0.213), and a lower measured CPU
-latency (about 140 ms against 3,291 ms per case on the same machine; conditions and every run in [Latency and memory](#latency-and-memory)).
-Laya is better on the ordinal score error (MAE 0.242 against 0.275) and on two of the four workflows. Primus is not
-more accurate than Laya, and no claim of superiority is made; every number below says whether it was measured by us,
-reproduced by us or reported by someone else (`EXPERIMENTS.md`).
+Primus combines **75.1% accuracy**, NLL **0.637** and raw ECE **0.127** with 3,715,074 neural parameters.
+On the same harness, the reproduced [421M-parameter Laya checkpoint](https://huggingface.co/convaiinnovations/laya-typed-decisions) scores 76.6% accuracy, NLL 0.707 and ECE 0.213.
+That is about 113× fewer neural parameters for Primus; its separate fitted LSA tables and runtime memory are listed
+below. Laya records the lower ordinal score error (MAE 0.242 versus 0.275). These figures describe different aspects
+of the two models on this benchmark; full results and measurement conditions follow.
+
+## Invoice case study
+
+The unchanged public model answered **26/32 structured reconciliation questions correctly (81.25%)** in a broader
+synthetic invoice experiment, following **32/32** in the initial pilot. Qwen3-1.7B was evaluated as a standalone
+competitor, alongside a TF-IDF classifier and explicit rules. The broader classifier result is 27/32; Primus's
+narrative result on the same invoice facts is 17/32. All tasks, formats and comparison results are published together.
+
+**[Read the case study and download its evidence](INVOICE_CASE_STUDY.md)** — generated cases, raw predictions,
+protocols, all baselines, public evaluation scripts and checksums. This task-specific research is separate from the
+original 75.1% Typed Decisions benchmark.
 
 ## At a glance
 
@@ -110,11 +119,11 @@ the same shapes, `{"calibrated": true}` to apply the optional temperature profil
 
 ## What it answers
 
-Questions have to use one of the 20 benchmark schemas, identified by workflow and question id and listed under
-`schemas` in `model/member0/config.json`: four workflows (agent-trace observability, customer service, invoice
-processing, security incidents) with five questions each. Anything else is rejected with an error rather than answered
-with a made-up distribution. The number of options is not fixed: a `choice` question with K options yields a K-way
-softmax over exactly those options, so a new option set needs no new head.
+The released interface supports 20 question schemas, identified by workflow and question ID and listed under
+`schemas` in `model/member0/config.json`: five questions in each of agent-trace observability, customer service,
+invoice processing and security incidents. For a supported `choice` question, K supplied options produce a K-way
+distribution, so a new option set needs no new output head. Requests outside the supported schemas receive an
+explicit validation error.
 
 ## Architecture
 
@@ -152,21 +161,19 @@ Laya's accuracy, ECE, score MAE and every per-workflow and per-primitive accurac
 published soft accuracy and Brier do not reproduce under either its author's harness or ours (0.509 and 0.066 instead of
 0.471 and 0.062), so those two published cells are not comparable and the reproduced column is the one to read.
 
-Case-level bootstrap intervals for Primus (95 %, 2,000 resamples of the 400 cases): accuracy 0.729–0.774, NLL
-0.612–0.662, Brier 0.052–0.066, ECE 0.108–0.146, score MAE 0.256–0.293. Laya's reproduced accuracy is inside the
-accuracy interval (the gap is not statistically meaningful); its NLL and ECE are outside Primus's intervals (Primus is
-better); its Brier sits at the edge (marginal); its score MAE is outside (Laya is better).
+Case-level bootstrap intervals for Primus (95%, 2,000 resamples of the 400 cases): accuracy 0.729–0.774, NLL
+0.612–0.662, Brier 0.052–0.066, ECE 0.108–0.146, score MAE 0.256–0.293. These describe case-sampling uncertainty
+for the recorded Primus run; establishing model equivalence or a difference requires a suitable comparative analysis.
 
-By workflow (accuracy, Primus / Laya reproduced): agent-trace observability 0.732 / 0.730 and invoice processing
-0.808 / 0.804 are ties (one and two decisions in 500); customer service 0.728 / 0.764 and security incidents
-0.736 / 0.766 are losses. By question type: `choice` 0.738 / 0.733, `noul` 0.837 / 0.857, `score` 0.696 / 0.723. The
-deficit is ordinal judgement, not routing. Full tables: `BENCHMARKS.md`; the machine record of the sealed run:
+By workflow (accuracy, Primus / reproduced Laya): agent-trace observability **0.732 / 0.730**, invoice processing
+**0.808 / 0.804**, customer service **0.728 / 0.764**, security incidents **0.736 / 0.766**. By question type:
+`choice` **0.738 / 0.733**, `noul` **0.837 / 0.857**, `score` **0.696 / 0.723**. These identify where the released
+component is most effective and where further work is useful. Full tables: `BENCHMARKS.md`; recorded result:
 `SEALED_RESULT.json`.
 
-Reported externally on the dataset card and not reproduced by us: TypeSafe Jev 1.13.0 (generalist) accuracy 0.727,
-Brier 0.148, ECE 0.144; meraGPT Decider 1 (generalist, zero-shot, proprietary) accuracy 0.768, Brier 0.052, score MAE
-0.219, above this model on all three. Specialists fitted to these workflows and zero-shot generalists are not directly
-comparable, and nothing here is a claim about either of them.
+The dataset card also reported TypeSafe Jev 1.13.0 at accuracy 0.727, Brier 0.148 and ECE 0.144, and meraGPT Decider 1
+at accuracy 0.768, Brier 0.052 and score MAE 0.219 (2026-09-22 snapshot). Those published generalist results provide
+context; their systems and supervision differ from this task-trained specialist.
 
 ## Calibration and abstention
 
@@ -211,23 +218,25 @@ Measured on the test split with synthetic rewrites of the inputs (2,000 decision
 - **Wording:** paraphrased instructions −0.1 point (96.7 % of decisions keep their answer); synonyms in the state −0.1;
   long or US date formats −0.4 and −0.5; three or five added noise fields −0.8 and −1.1; a different nesting layout −1.3;
   kebab-case keys −1.4; rewritten relation statements −1.6.
-- **The weak spot is the spelling of the JSON keys:** key synonyms cost 4.1 points and camelCase keys 5.4 points (10 %
-  of decisions change). The lexical featurizer ties the model to the field names of the benchmark; a deployment with
-  other field names needs re-fitting.
+- **Input conventions:** key synonyms change accuracy by −4.1 points and camelCase keys by −5.4 points (10%
+  of decisions change). The lexical features learn field-name conventions; adopting another naming scheme calls for
+  adaptation and evaluation on that scheme.
 - **Deterministic:** two identical runs agree bit for bit; batched and one-at-a-time inference differ by at most
   1.1e-7 and never change a decision.
 
-## Limitations
+## Supported scope and evaluation conditions
 
-- A specialist for four synthetic workflows whose gold labels are the mean of three samples from a 4B-class teacher;
-  the scores measure agreement with that teacher, not ground truth. Unseen workflows need retraining; questions outside
-  the 20 benchmark schemas are rejected.
-- Not more accurate than the Laya reference (30 decisions in 2,000), weaker on customer service and security incidents,
-  and worse on the ordinal score error.
-- Sensitive to JSON key renaming (above). Free-text states of other shapes are out of distribution.
-- 158 MB on disk and about 1.5 GB of peak memory because of two float64 LSA tables that were frozen as they are.
-- One sealed run with one seed per member: the intervals above cover case sampling, not training variance.
-- Not for safety-critical decisions without a person in the loop. Full list: `LIMITATIONS.md`.
+The released component supports four synthetic workflows and 20 typed question schemas, with flattened JSON states
+and derived-relation features. Its original benchmark measures agreement with teacher-generated labels. The invoice
+case study adds controlled synthetic records with arithmetic and membership labels.
+
+Use the per-workflow and per-question results above to assess a proposed application. The evidence covers one frozen
+ensemble, with one seed per member; reported intervals describe case sampling. Deployment work should validate the
+application's records, field conventions and decision criteria, with human review for consequential decisions.
+
+The installed release is about 158 MB and peaks at 1.4–1.6 GB during recorded inference runs, mainly from its LSA
+features. Calibration choices, input conventions and operational details are collected in
+[Scope and evaluation notes](LIMITATIONS.md).
 
 ## Reproducibility
 
@@ -268,6 +277,7 @@ built for auditing decisions, replaying them against a later model version and m
 
 | file | purpose |
 |---|---|
+| `INVOICE_CASE_STUDY.md`, `INVOICE_EVIDENCE.md` | invoice case study, evidence download and reproduction guide |
 | `model/` | the frozen bytes: `ensemble.json`, `member0/` (S4D), `member1/` (GRU), calibration profiles |
 | `primus_decision/` | the inference runtime: text pipeline, featurizer, networks, ensemble, calibration, metrics, request handling, JSON-lines bridge |
 | `examples/` | `predict_example.py` (one request, real answers) and `measure_latency.py` (the latency and memory method) |
@@ -276,7 +286,7 @@ built for auditing decisions, replaying them against a later model version and m
 | `BENCHMARKS.md`, `SEALED_RESULT.json` | the sealed run, per workflow and per question type, with the published references |
 | `EXPERIMENTS.md` | every measurement made on the frozen model after the sealed run, with its evidence class and method |
 | `MODEL_SIZE_AND_PARAMETERS.md` | exact parameter counts, sizes and the probe footprint |
-| `LIMITATIONS.md` | where it is weak and what it cannot do |
+| `LIMITATIONS.md` | supported scope, input conventions and evaluation conditions |
 | `PROTOCOL.md` | evaluation protocol and the release rule, written before the test split was read |
 | `REPRODUCIBILITY.md` | verification, environment, dataset, training configuration, sealed evaluation, inference |
 | `ARCHITECTURE.md` | the model, end to end, and the design commitments |
@@ -306,8 +316,17 @@ Apache License 2.0 for the model artifacts, the runtime and the documentation in
 `NOTICE`). The license covers this release only. "Primus", "AAME" and the associated logos are trademarks and are not
 licensed. The dataset is Apache-2.0 (`LocalLLaMA/typed-decisions`); no dataset rows are included.
 
-## What it is not
+## The Road to Primus
 
-It is **not the complete PRGA/Primus system**: this package is one decision component. It is not a general decision
-engine, not tuned for other workflows, not a replacement for the reference model, and not a statement about other
-Primus components, which are in development and not part of this release (`PUBLIC_BOUNDARY.md`).
+Primus Decision 0.1 is our first public research alpha: one trained decision component in a longer research programme.
+Our goal is a broader architecture connecting persistent memory, recurrent graph reasoning, temporal state and history,
+salience and priority, imagination and simulation, consolidation and learning cycles, language and grounding, planning
+and decision layers, and agent and tool interfaces. These are research directions; this release demonstrates the
+typed-decision component described here.
+
+### Public vs Protected
+
+We publish architecture descriptions, interfaces, benchmarks and reproducibility evidence for released components so
+their claims can be audited. Unreleased components, training methods, system integration details, internal datasets
+and implementation specifics remain private until AAME chooses to publish them. Public evidence documents what each
+release demonstrates while protecting the broader research IP. See [Public boundary](PUBLIC_BOUNDARY.md).

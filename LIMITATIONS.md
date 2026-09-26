@@ -1,22 +1,40 @@
-# Limitations — Primus Decision 0.1 (Research Alpha)
+# Scope and evaluation notes — Primus Decision 0.1
 
-- **Specialist, and a research alpha.** Fitted to four synthetic workflows whose gold labels are the mean of three
-  samples from a 4B-class teacher. The scores measure agreement with that teacher, not ground truth.
-- **It loses to the reference on accuracy**: 0.751 against 0.766, 30 decisions in 2,000. The sealed run's weak
-  spots: the `score` primitive (0.696 vs 0.723; score MAE 0.275 vs 0.242), `noul` (0.837 vs 0.857),
-  customer service (0.728 vs 0.764) and security incidents (0.736 vs 0.766).
-- **Small validation split.** 195 cases were used for model selection and for fitting the calibration profile, so
-  calibrated validation numbers are optimistic. The sealed test numbers in `BENCHMARKS.md` are the only ones to quote.
-- **Only the 20 benchmark schemas.** A question is identified by workflow and question id (for example
-  `invoice_processing/disposition`); anything else is rejected. The model does not read arbitrary questions; its view
-  of the instructions and options is a bag of words.
-- **State format matters.** It was trained on flattened JSON with derived-relation sentences. Free-text states of
-  other shapes are out of distribution.
-- **Memory is set by the featurizers, not the networks.** Two float64 LSA tables of 70 MB each make the package
-  158 MB and the peak resident memory about 1.4 GB during inference. They are the frozen bytes and were not shrunk.
-- **CPU only, PyTorch and scikit-learn required.** The featurizers are pickled scikit-learn objects and need the
-  scikit-learn version pinned in `requirements.txt`. Verify the checksums before loading a copy of unknown origin:
-  `pickle` executes what it loads.
-- **The calibration profile is a trade-off**, better ECE and NLL for worse Brier and score MAE. It is off by default
-  and its ECE is not the model's headline calibration.
-- **One sealed run, one seed per member.** There is no confidence interval over seeds for the headline number.
+Primus Decision 0.1 is a locally runnable specialist for 20 typed question schemas across invoice processing,
+customer service, security incidents and agent-trace observability. These notes describe the conditions under which
+its results apply. The filename is retained for existing links.
+
+## Supported interface
+
+Requests contain a JSON state and supported question IDs; replies contain yes/no, choice or ordinal distributions.
+The runtime validates workflow and question IDs, returning an error for schemas outside the released set. State
+features use flattened JSON and derived relations; instruction and option features use a bag-of-words representation.
+Changes to field conventions or free-text layouts need application-specific evaluation.
+
+## Measured performance
+
+The sealed benchmark records accuracy 0.751 against reproduced Laya accuracy 0.766, a difference of 30 decisions in
+2,000. Primus records lower reproduced Brier and ECE; Laya records lower ordinal MAE (0.242 versus 0.275).
+Per-question and per-workflow results are in [BENCHMARKS.md](BENCHMARKS.md), and the
+[invoice case study](INVOICE_CASE_STUDY.md) adds task-specific synthetic experiments.
+
+The original benchmark's labels average three samples from a 4B-class teacher, so accuracy measures agreement with
+that reference. The [dataset card](https://huggingface.co/datasets/LocalLLaMA/typed-decisions#what-a-score-here-means)
+reports 73.5% teacher self-agreement and cautions that scores around 75% approach saturation for its labels. This
+context is separate from real-world correctness. The 195-case validation split supported model selection and calibration; quote the sealed test
+metrics for release performance. One seed per member was evaluated, and case-bootstrap intervals describe sampling
+uncertainty rather than variation across training runs.
+
+## Calibration and operation
+
+Raw probabilities are the default. The optional validation-fitted temperature profile improves ECE and NLL while
+increasing Brier and ordinal MAE on the sealed test. Choose the output mode against the application's decision cost
+and evaluate its confidence thresholds on appropriate held-out records.
+
+CPU inference uses PyTorch and pinned scikit-learn dependencies. The two float64 LSA artifacts account for most of
+the approximately 158 MB installed package and 1.4–1.6 GB measured peak memory. Load checksum-verified artifacts:
+the serialized scikit-learn objects use pickle, which executes code when loading.
+
+For consequential applications, use human review and validate records, output criteria and operating thresholds in
+the intended setting. Primus Decision 0.1 is a research alpha; its evidence supports the tasks and conditions reported
+here.

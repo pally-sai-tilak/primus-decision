@@ -13,17 +13,34 @@
 | license (Apache-2.0, this release only), trademark notice, third-party provenance and redistribution rights, citation | `LICENSE`, `NOTICE`, `THIRD_PARTY.md`, `CITATION.cff` |
 | a verification workflow for the hosted repository (checksums, dependencies, one inference, the bridge) | `.github/workflows/verify.yml` |
 
-## Deliberately not in this release
+## Protected research
 
 The system around the model and the other Primus components in development: their architectures, data, objectives,
 evaluation sets, checkpoints and deployment. The training, model-selection and hyper-parameter-search code, and every
-training run other than the two members shipped here. Internal research records and evaluation sets other than the
-public benchmark. The dataset rows themselves, which are public under the dataset's own license.
+training run other than the two members shipped here. Internal research records and evaluation sets beyond those explicitly published. Original benchmark dataset rows
+are available from their public source under its own license; the invoice study adds its generated evaluation records.
 
-## How the boundary is enforced
+## The Road to Primus
 
-Before export, an automated gate scans every file of this tree, and the single commit that publishes it, for private
-paths, internal identifiers, names of other components, credentials and unsupported claims; verifies every model file
-against the frozen hashes; recomputes the generated records from the frozen ones; re-runs the behavioral-equivalence
-suite; and checks that the tree contains only the entries listed above. The runtime is not an obfuscated or minified
-copy of anything: it is the model definition and the inference path in plain Python.
+Primus Decision 0.1 is the first public research alpha and one trained component. AAME's longer-term goal is a broader
+architecture connecting persistent memory, recurrent graph reasoning, temporal state and history, salience and
+priority mechanisms, imagination and simulation, consolidation and learning cycles, language and grounding,
+planning and decision layers, and agent and tool interfaces. These are intended research directions, not claims that
+the released decision model already implements those capabilities or that AGI has been achieved.
+
+## Public vs Protected
+
+Public releases will include enough architecture, benchmarks, interfaces and reproducibility evidence to make their
+stated claims auditable. The extent of reproduction is stated for each artifact: public Decision 0.1 inference can
+be reproduced from the shipped model; the original training pipeline remains private.
+
+Unreleased components, training methods, system integration details, internal datasets and implementation specifics
+remain protected and private until AAME chooses to publish them. This boundary protects the broader roadmap while
+allowing readers to examine each demonstrated public capability.
+
+## Invoice study export
+
+The [invoice case study](INVOICE_CASE_STUDY.md) adds generated evaluation cases, protocols, recorded
+predictions, model identifiers, checksums and public-model evaluation scripts. Original numerical records are
+preserved. Its evidence guide identifies publication adaptations and omitted private candidate code; no private
+training code or checkpoints are included. The model files, runtime and sealed release results remain unchanged.

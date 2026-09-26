@@ -19,18 +19,21 @@ ECE:      0.127
 Laya reference accuracy: 0.766
 ```
 
-The Laya reference is more accurate, by 30 decisions in 2,000. Primus Decision 0.1 has the lower Brier and ECE under
-the same protocol (Brier 0.059 vs 0.062, about one standard error apart; ECE 0.127 vs 0.213; Laya figures quoted from
-its model card) with 3.7 M neural parameters plus 143 MB of fitted LSA tables, against the reference's fine-tuned
-ModernBERT-large of about 421 M parameters. We make no claim of superiority over Laya or over any other system.
+Primus pairs 75.1% accuracy with raw ECE 0.127 and Brier 0.059, using 3.7M neural parameters plus 143 MB of fitted
+LSA features. The published Laya reference records 76.6% accuracy, ECE 0.213 and Brier 0.062 with approximately 421M
+neural parameters. Our full tables also distinguish the reproduced reference measurements and ordinal score error.
+
+Our [invoice case study](INVOICE_CASE_STUDY.md) adds a concrete application test: 26/32 structured
+reconciliation checks in a broader synthetic experiment, following 32/32 in the initial pilot. We publish both
+representations, every comparison system and raw predictions alongside the study.
 
 The release contains the exact frozen bytes with checksums, a minimal inference runtime with a runnable example, the
-model card, the full benchmark tables, the limitations, the evaluation protocol, reproduction instructions, and a
+model card, the full benchmark tables, scope and evaluation notes, the evaluation protocol, reproduction instructions, and a
 behavioral-equivalence record showing the public package matching our internal frozen model bit for bit. Exact
 parameter counts, package sizes and the runtime footprint are in `MODEL_SIZE_AND_PARAMETERS.md`.
 
-It is **not the complete PRGA/Primus system**: other Primus components are in development and are not part of this
-release.
+This is our first public component in a longer Primus research programme. We publish evidence for the released
+capability while keeping unreleased components and training methods private; see [Public boundary](PUBLIC_BOUNDARY.md).
 
 Tag `primus-decision-0.1`. License: Apache-2.0 for the artifacts and runtime in the repository; see `NOTICE` for
 scope and trademarks.

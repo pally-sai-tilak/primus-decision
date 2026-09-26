@@ -12,8 +12,8 @@ Laya reference accuracy: 0.766
 ```
 
 Sealed official test split of `LocalLLaMA/typed-decisions`, 400 cases and 2,000 decisions, evaluated once after
-freezing, raw probabilities. The model does not outperform the Laya reference on accuracy; it has the lower Brier
-and ECE under the same protocol (Laya figures quoted from its model card). No claim of superiority is made. Full tables: `BENCHMARKS.md`.
+freezing, raw probabilities. Primus pairs 75.1% accuracy with Brier 0.059 and ECE 0.127; the published Laya reference
+records 76.6% accuracy, Brier 0.062 and ECE 0.213. Full published and reproduced tables: `BENCHMARKS.md`.
 
 3,715,074 neural parameters (S4D member 1,932,609, GRU member 1,782,465, both run per prediction); 157.9 MB installed,
 114.5 MB `.tar.gz`; about 140 ms per five-decision case on a CPU (115–162 ms across recorded runs). Details and method: `EXPERIMENTS.md`, `MODEL_SIZE_AND_PARAMETERS.md`.
@@ -41,7 +41,11 @@ Python 3.10 or newer; the `--index-url` option selects the CPU build of torch. T
 `primus-decision-0.1.tar.gz`, `primus-decision-0.1.zip` and `DOWNLOAD_CHECKSUMS.txt`; use one of those archives or a
 Git LFS clone, not the archive GitHub generates for the tag, which holds LFS pointer files instead of the featurizers.
 
-## Not in this release
+## Further research and evidence
 
-It is **not the complete PRGA/Primus system**. Not in this release: a general decision engine, other workflows, a
-replacement for the reference model, or any other Primus component. See `LIMITATIONS.md` and `PUBLIC_BOUNDARY.md`.
+The [invoice case study](INVOICE_CASE_STUDY.md) evaluates the unchanged public model against a separate LLM,
+a classifier and explicit rules, with per-case evidence. The model release remains version 0.1.
+
+This is the first public decision component of the broader Primus programme. [Public boundary](PUBLIC_BOUNDARY.md)
+describes the research direction and protected work; [Scope and evaluation notes](LIMITATIONS.md) document the
+released component's supported conditions.

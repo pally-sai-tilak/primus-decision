@@ -30,3 +30,15 @@ The first trained model component of Primus: a non-transformer typed-decision re
   checkpoint reproduced on the same harness), each with its evidence class and method; `examples/measure_latency.py`
   reproduces the latency method; `CITATION.cff` and a verification workflow added; `README.md` rewritten around the same numbers.
 - No model file, no runtime file and no answer changed: the behavioral-equivalence record is unchanged.
+
+## Invoice case study and documentation update — 2026-09-26
+
+- Published three synthetic invoice experiments with their recorded cases, predictions, protocols, baselines and
+  checksums under `INVOICE_CASE_STUDY.md`.
+- Added a public-model pilot runner and a standard-library evidence verifier. Private candidate implementation and
+  checkpoints remain outside the publication; the evidence guide records the export boundary.
+- Revised the repository introduction, model card and public summary pages to lead with demonstrated capabilities,
+  retaining benchmark results, comparison figures and evaluation conditions. Clarified teacher-labelled training
+  data, the broader research direction and the distinction between public and protected work.
+- Updated documentation checksums. Frozen model files, inference runtime, original sealed result, release tag and
+  original protocol remain unchanged. This is an evidence and documentation publication, not a new model version.
