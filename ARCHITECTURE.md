@@ -1,8 +1,9 @@
 # Architecture — Primus Decision 0.1
 
-Primus Decision is the fast typed-decision component of Primus: given a JSON state and typed questions about it, it
-returns probability distributions. The system that calls it and decides what to do with the answers is separate and not
-part of this release. This page describes the model that is.
+Primus Decision 0.1 is the first public typed-decision component of Primus: given a JSON state and supported typed
+questions, it returns probability distributions. This page describes the released inference architecture. Applications
+can use the distributions within their own decision and orchestration layers; the broader research direction is
+introduced in the [Research FAQ](RESEARCH_FAQ.md).
 
 ## One decision, end to end
 
@@ -38,14 +39,16 @@ weights and 143 MB of LSA tables. `MODEL_SIZE_AND_PARAMETERS.md` has the per-mod
 - No transformer and no pretrained encoder: recurrent and state-space encoders trained from scratch on the benchmark's
   training part. The additive pooling has query and key projections, but it attends over the encoder states of one
   question only, never between tokens.
-- No hard-coded cardinality: a question with K options yields a K-way softmax, so a new option set needs no new head.
-- Sealed evaluation: the official test split was read once, after the architecture, hyper-parameters and calibration
-  were frozen with content hashes, under a release rule written before the split was opened (`PROTOCOL.md`).
+- For a supported question schema, K supplied trained option keys yield a K-way softmax. A `choice` request can select and reorder those keys and supply their descriptions; the public configuration lists them under `schema_options`.
+- Sealed evaluation: the release result comes from one sealed evaluation after the architecture, hyper-parameters
+  and calibration were frozen with content hashes, under a rule written before the split was opened (`PROTOCOL.md`).
+  Later verification and diagnostic measurements are identified separately in `EXPERIMENTS.md`.
 - Raw probabilities by default; calibration is a separate, labelled, optional profile.
 - Everything content-addressed: weights, featurizers, configurations, dataset files and the sealed result
   (`PROVENANCE.json`, `SHA256SUMS`).
 
-## Not in this release
+## Broader research and public evidence
 
-The system around the model, other Primus components and the training code are not part of this release and are not
-described here. `PUBLIC_BOUNDARY.md` lists what is included and what is not.
+This release makes the decision architecture and inference artifacts inspectable. AAME's broader Primus research
+connects this direction with additional components and integration work. [Public boundary](PUBLIC_BOUNDARY.md)
+describes the research programme and identifies the work AAME protects until publication.

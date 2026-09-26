@@ -1,6 +1,7 @@
 # Experiments — Primus Decision 0.1 (Research Alpha)
 
-Every measurement made on the frozen model after its one sealed run, with its evidence class and method. Three classes
+Recorded post-release benchmark analyses of the frozen model, with their evidence class and method. The later
+[invoice study](INVOICE_CASE_STUDY.md) has its own protocols and evidence. Three classes
 are kept apart throughout this repository:
 
 - **measured by us** — our model, our harness, our machine; the record of each run is described with its method below;
@@ -10,14 +11,15 @@ are kept apart throughout this repository:
 Nothing in this document changed the model. The sealed run of 2026-09-22 (`SEALED_RESULT.json`, `PROTOCOL.md`) is
 the claim; the measurements below were taken afterwards on the hash-checked release bytes, the official test split was
 not used for any architectural, hyper-parameter or calibration choice, and no second sealed run exists. The test split
-is therefore open for diagnosis of this version and closed for claims. All runs use 2 CPU threads on the same machine
+is used for disclosed diagnostic and verification measurements after the sealed release evaluation; these analyses
+retain their own methods and do not replace the sealed result. All runs use 2 CPU threads on the same machine
 class (4-vCPU Intel Xeon at 2.10 GHz, 15.7 GiB, Linux x86_64, Python 3.11, PyTorch 2.14 CPU) unless stated.
 
-## 1. The sealed result, verified independently (measured by us)
+## 1. The sealed result, checked with a separately implemented metric calculation (measured by AAME)
 
-An implementation of the protocol's metrics written independently of the runtime's `metrics.py`, applied to a fresh
-run of the release bytes (every model file hash-checked against `SHA256SUMS` first), reproduces every recorded cell of
-`SEALED_RESULT.json` exactly: the largest difference over 188 cells (overall, per workflow, per question type, raw and
+A separate implementation of the protocol's metrics, written independently of the runtime's `metrics.py`, applied to a fresh
+run of the release bytes (every model file hash-checked against `SHA256SUMS` first), agrees with every recorded cell of
+`SEALED_RESULT.json` to numerical precision: the largest difference over 188 cells (overall, per workflow, per question type, raw and
 calibrated) is 1.1e-16. The fresh run's probabilities differ from the recorded 5-decimal diagnostic dump by at most
 5.0e-6, which is the rounding of that dump.
 
@@ -50,10 +52,10 @@ Raw: accuracy 0.7510, soft accuracy 0.5635, Brier 0.0591, KL 0.1024, TV 0.1434, 
 | ECE | 0.127 | 0.108 – 0.146 |
 | score MAE | 0.275 | 0.256 – 0.293 |
 
-Read against Laya's reproduced figures of section 6: its accuracy 0.766 is inside the accuracy interval (the gap is
-not statistically meaningful at this test size); its NLL 0.707 and ECE 0.213 are outside (Primus is better on both);
-its Brier 0.066 sits at the edge (marginal); its score MAE 0.242 is outside (Laya is better). The intervals cover case
-sampling only: with one seed per member, training variance is not measured.
+These intervals describe variation from resampling the recorded Primus test cases. Primus and reproduced Laya score
+75.1% and 76.6% accuracy, respectively; their other point estimates are compared in section 6. A confidence interval
+for one model is not a test of equivalence or a paired confidence interval for the difference between models.
+Training variability is a separate question: this release records one frozen ensemble with one seed per member.
 
 ## 3. Calibration and abstention (measured by us)
 
@@ -139,9 +141,10 @@ does not change; TV is the mean total-variation distance between the two distrib
 | keys replaced by synonyms | 2,000 | 0.751 → 0.711 | −4.1 | 90.0 % | 0.062 |
 | keys renamed to camelCase | 2,000 | 0.751 → 0.698 | −5.4 | 89.8 % | 0.061 |
 
-Option order is an exact invariance (the largest probability shift is 3.7e-8). Wording, dates, noise fields and layout
-cost at most 1.3 points; kebab-case keys and rewritten relation statements 1.4 and 1.6; the spelling of the JSON keys is
-the weak spot, because the lexical featurizer ties the model to the field names of the benchmark. Consistency: two
+Reordering options preserves every recorded answer, with a largest probability shift of 3.7e-8. The tested wording,
+date, noise-field and layout changes shift accuracy by at most 1.3 percentage points; kebab-case keys and rewritten
+relation statements shift it by 1.4 and 1.6 points. Field-name synonyms and camelCase changes identify concrete targets
+for adapting the lexical input representation to other conventions. Consistency: two
 identical runs differ by 0.0 in every probability; batched and one-at-a-time inference differ by at most 1.1e-7 and
 never change a decision.
 
@@ -170,24 +173,31 @@ the ones used in this repository. Deviations from the author's setup: CPU instea
 pinned dataset revision instead of the datasets library; our protocol uses the gold distribution without an epsilon and
 clips probabilities at 1e-12 in the KL term (the ported harness is reported alongside and agrees).
 
-Like for like on this harness, Primus Decision 0.1 is 1.5 accuracy points behind (inside its interval), ahead on NLL
-(0.637 vs 0.707), ECE (0.127 vs 0.213), Brier (0.059 vs 0.066, marginal), KL (0.102 vs 0.122), TV (0.143 vs 0.179) and
-soft accuracy (0.563 vs 0.509), and behind on score MAE (0.275 vs 0.242, meaningful) and within-1 (0.984 vs 0.995).
-Parameters: 3,715,074 against about 421 million according to Laya's model card (its weights file is 843 MB), about
-1/113; installed size 158 MB against 843 MB, about 1/5, because of the two 71 MB LSA tables.
+On this recorded harness, Primus and Laya score 75.1% and 76.6% accuracy, a 1.5 percentage-point difference. Primus
+records lower NLL (0.637 versus 0.707), ECE (0.127 versus 0.213), Brier (0.059 versus 0.066), KL (0.102 versus 0.122),
+and TV (0.143 versus 0.179), with higher soft accuracy (0.563 versus 0.509). Laya records lower ordinal MAE
+(0.242 versus 0.275) and higher within-one-level accuracy (0.995 versus 0.984). These are observed differences
+for the specified checkpoints and evaluation.
+Primus has 3,715,074 neural parameters; Laya's model card reports approximately 421 million, a ratio of about 113:1.
+Primus's original installed release is approximately 158 MB including its fitted LSA tables; Laya's checkpoint weight
+file alone is approximately 843 MB. Neural parameters, artifact size and runtime memory are reported separately.
 
-## 7. What this evidence supports, and what it does not
+## 7. Demonstrated capabilities and research directions
 
-Supported on this benchmark: a compact open specialist with typed-decision accuracy within sampling noise of the
-strongest open specialist we could reproduce, better probability quality (NLL, ECE; Brier marginally), 20–29x lower
-per-case CPU latency on the same machine and 113x fewer neural parameters; usable confidence for abstention; exact
-invariance to option order.
+Primus Decision 0.1 demonstrates local typed-decision inference with 3.7M neural parameters, 75.1% accuracy on the
+recorded benchmark, and the probability-quality measurements above. Its observed warm CPU latency is 20–29 times
+lower than reproduced Laya under the documented runtime settings. Confidence ranking supports selective prediction
+on these cases, and reordering choice options preserves every recorded answer.
 
-Not supported: any "best" wording (Laya is more accurate; the dataset card's meraGPT Decider 1 reports higher accuracy,
-lower Brier and lower score MAE, reported externally and not reproduced here); any claim about TypeSafe Jev (reported
-externally only, not reproduced under an identical protocol); any generalist claim (the model answers only the 20
-benchmark schemas); any robustness claim beyond the benchmark's field names; any statement about training variance
-(one seed per member).
+This release exposes 20 question schemas across four workflows. The evaluations measure this checkpoint and
+interface; they do not set the scope or attainable accuracy of future Primus components. The robustness table
+identifies which input transformations preserved performance and which provide concrete adaptation targets.
+New schemas, representations and applications can be investigated through separately identified model or interface
+revisions and evaluated with their own evidence.
+
+Primus, Laya and the externally reported generalist systems have distinct accuracy, probability, runtime and
+supervision profiles. Tables retain those distinctions so readers can choose comparisons relevant to their application.
+See the [Research FAQ](RESEARCH_FAQ.md) for the relationship between this release and the broader programme.
 
 ## 8. Records
 

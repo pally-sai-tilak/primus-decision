@@ -2,7 +2,7 @@
 
 **AAME · 26 September 2026 · Three controlled synthetic experiments**
 
-Primus Decision 0.1 performs structured invoice checks locally with a 3.7-million-parameter model and no LLM call at inference. In our broader invoice experiment, the unchanged public model answered **26 of 32 reconciliation questions correctly (81.25%)**. In the initial, simpler pilot it answered **32 of 32 correctly**, including after the question was reworded.
+Primus Decision 0.1 performs structured invoice checks locally with 3.7 million neural parameters and fitted LSA features, without an LLM call at inference. Using its released weights without retraining, it answered **26 of 32 reconciliation questions correctly (81.25%)** in our broader synthetic invoice experiment. The initial pilot recorded **32 of 32**, retaining that score after question rewording. The full study records the input preparation, comparison systems and per-case answers.
 
 We built this study to make that capability inspectable: the records, questions, model answers, comparison systems and evaluation conditions accompany the result. Qwen3-1.7B runs as an independent competitor. Its outputs never enter Primus.
 
@@ -61,13 +61,13 @@ We followed up on Qwen's pilot answers with six answer-format conditions on the 
 | A=false, B=true | 16/32 | 8/32 |
 | A=true, B=false | 16/32 | 8/32 |
 
-The original scoring replay reproduced every probability and label exactly. The audit is a retrospective diagnostic on already inspected cases. The subsequent broader experiment reports both capitalization-aware token scoring and free answers. These results describe Qwen3-1.7B in this non-thinking setup, rather than its strongest possible reasoning configuration or LLMs as a whole.
+The original scoring replay reproduced every probability and label exactly. The audit is a retrospective diagnostic on already inspected cases. The subsequent broader experiment reports both capitalization-aware token scoring and free answers. The comparison identifies the exact Qwen3-1.7B checkpoint, non-thinking template, answer methods and generation settings, so the recorded result can be reproduced and extended to other configurations.
 
 [Answer-format protocols and all 384 predictions](primus-invoice-evidence-2026-09-26.zip)
 
 ## Model and evaluation details
 
-- **Primus:** the unchanged public Decision 0.1 ensemble, 3,715,074 neural parameters, S4D and bidirectional GRU encoders with fitted TF-IDF/LSA features; local CPU float32 inference, two threads. No transformer or pretrained language encoder is part of Primus. Its original training uses teacher-labelled data; the teacher is absent at inference.
+- **Primus:** the public Decision 0.1 ensemble with its released weights and fitted features, 3,715,074 neural parameters, S4D and bidirectional GRU encoders with fitted TF-IDF/LSA features; local CPU float32 inference, two threads. No transformer or pretrained language encoder is part of Primus. Its original training uses teacher-labelled data; the teacher is absent at inference.
 - **Qwen:** the official Qwen/Qwen3-1.7B checkpoint at revision `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`, Apple GPU float16, official non-thinking template. Token scoring normalizes over the specified answer tokens. Free generation is greedy with a 12-token cap; initial true/false answers are parsed ignoring case and leading punctuation, and invalid answers count as incorrect.
 - **Inputs:** both systems receive the same supplied facts and question text for each presentation. The broader experiment fits complete states within Primus's 640-token limit and uses the same six-line cap on generic derived relations for both presentations. The pilot used the original default cap of 40, so changes between experiments reflect both cases and preprocessing.
 - **Evidence units:** the pilot has 32 base invoices, the answer-format audit reuses them, and the broader experiment has 32 new base invoices. Multiple questions, paired variants and two presentations are related observations. Scores are reported by task and condition rather than pooled into a single accuracy.
@@ -79,7 +79,7 @@ These are AAME's controlled, assistant-generated synthetic experiments. The proc
 
 This study establishes a concrete starting capability: a compact, locally runnable Primus component can make supported structured invoice decisions, with results that can be checked per case. The next research step is to extend that performance across representations and richer records, then evaluate externally sourced invoices with human-checked labels.
 
-The public model's original **75.1% Typed Decisions benchmark** remains a separate result on 400 cases and 2,000 decisions. The invoice experiments add task-specific evidence; they do not replace that benchmark or imply a completed general Primus system.
+These invoice results extend the evidence for the released decision component. Its original **75.1% Typed Decisions result** remains separately reported on 400 cases and 2,000 decisions. Further Primus releases will be evaluated against the capabilities they add. [Research FAQ](RESEARCH_FAQ.md) explains the relationship between the released component and the broader programme.
 
 ## Public evidence and protected work
 

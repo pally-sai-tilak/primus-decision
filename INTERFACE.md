@@ -8,7 +8,7 @@ readable version with one example each. The Python API in `primus_decision/predi
 
 A request is one state and one or more typed questions about it. The model answers the 20 benchmark schemas, identified
 by workflow and question id and listed under `schemas` in `model/member0/config.json`; any other pair is rejected with an
-error rather than answered.
+error rather than answered. Each schema also has trained option keys listed under `schema_options` in the model configuration. Inference looks up those keys; callers can select and reorder supported `choice` keys and supply their descriptions.
 
 ```json
 {
@@ -35,7 +35,7 @@ error rather than answered.
 | `state` | the JSON object the questions are about; a string that parses as JSON is treated as that JSON, any other string is used as raw text |
 | `questions` | question id → `{type, instructions, criteria}` |
 | `type` | `noul` (is the statement true), `choice` (which option), `score` (which ordinal level) |
-| `criteria` | `noul`: `null`, or `{"false": text, "true": text}`; `choice`: option key → option text, in scoring order; `score`: one text per level, level 0 first |
+| `criteria` | `noul`: `null`, or `{"false": text, "true": text}`; `choice`: trained option key → option text, in scoring order; a subset or reordering of the supported keys is accepted; `score`: one text per supported level, level 0 first |
 | `calibrated` | apply the temperature profile in `model/calibration.json`; off by default |
 
 The state is flattened to one `path: value` line per leaf and extended with derived-relation sentences (numeric
@@ -64,10 +64,10 @@ The numbers above are illustrative; run `examples/predict_example.py` for the mo
 
 ## Decision History record (`schemas/decision_history.schema.json`)
 
-A Decision History is an append-only log of what the model was asked and what it answered, one record per request, with
-the outcome added when it becomes known. It is the shape we use to audit decisions, replay them against a later model
-version, and measure calibration in production. The schema is deliberately storage-agnostic: a JSON-lines file, a
-database table or a message queue all work, and a record never depends on another record.
+Decision History defines a record format for logging each request, its probabilities and a later observed outcome.
+Integrators can use it to audit decisions, replay requests against a later model and measure calibration in their
+application. The schema is storage-agnostic; a JSON-lines file, database or message queue can store the records.
+Each record is self-contained. Logging is provided by the integrating application.
 
 ```json
 {

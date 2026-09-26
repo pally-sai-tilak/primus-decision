@@ -18,7 +18,7 @@ No dataset rows are included in this repository.
 |---|---|---|
 | Laya-typed-decisions: accuracy 0.766, soft accuracy 0.471, Brier 0.062, ECE 0.213, score MAE 0.242; per-workflow and per-primitive figures | model card "Benchmark" table, https://huggingface.co/convaiinnovations/laya-typed-decisions | 2026-09-22 |
 | Laya calibrated ECE ≈ 0.081 (family-level, post-temperature; context only) | https://huggingface.co/convaiinnovations/laya | 2026-09-22 |
-| TypeSafe Jev 1.13.0 (generalist), ModernBERT-base and MiniLM-L6 specialists, ceilings | dataset card baseline table, https://huggingface.co/datasets/LocalLLaMA/typed-decisions, revision `ea930645…` | 2026-09-22 |
+| TypeSafe Jev 1.13.0 (generalist), ModernBERT-base and MiniLM-L6 specialists, and the dataset card's teacher-agreement and factor-predictor reference measurements | dataset card baseline table, https://huggingface.co/datasets/LocalLLaMA/typed-decisions, revision `ea930645…` | 2026-09-22 |
 | meraGPT Decider 1 (generalist, zero-shot, proprietary): accuracy 0.768, soft accuracy 0.608, Brier 0.052, KL 0.096, ECE 0.180, score MAE 0.219, within-1 0.984 | dataset card leaderboard on `main` (added after revision `ea930645…`) | 2026-09-22 |
 
 ## Metric conventions
@@ -52,8 +52,10 @@ on the training split; loading them requires the scikit-learn version above.
 | inference runtime (`primus_decision/`) | AAME's own code | Apache-2.0 (this release) |
 | software dependencies | PyPI packages | not bundled; installed by the user under their own licenses (table above) |
 
-Result of the audit: every included file is either AAME's own work or derived statistics of an Apache-2.0
-dataset. Nothing in this repository requires a third-party permission to redistribute.
+The model release includes AAME's runtime and model artifacts, learned statistics from the cited public dataset,
+and attributed benchmark facts. The invoice evidence additionally includes generated cases, model outputs and
+evaluation records. Third-party model checkpoints used as comparators are obtained from their publishers and are
+not bundled in the evidence archive.
 
 ## This repository
 

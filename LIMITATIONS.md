@@ -18,12 +18,14 @@ The sealed benchmark records accuracy 0.751 against reproduced Laya accuracy 0.7
 Per-question and per-workflow results are in [BENCHMARKS.md](BENCHMARKS.md), and the
 [invoice case study](INVOICE_CASE_STUDY.md) adds task-specific synthetic experiments.
 
-The original benchmark's labels average three samples from a 4B-class teacher, so accuracy measures agreement with
-that reference. The [dataset card](https://huggingface.co/datasets/LocalLLaMA/typed-decisions#what-a-score-here-means)
-reports 73.5% teacher self-agreement and cautions that scores around 75% approach saturation for its labels. This
-context is separate from real-world correctness. The 195-case validation split supported model selection and calibration; quote the sealed test
-metrics for release performance. One seed per member was evaluated, and case-bootstrap intervals describe sampling
-uncertainty rather than variation across training runs.
+The original Typed Decisions benchmark measures agreement with synthetic teacher-derived labels. Its
+[dataset card](https://huggingface.co/datasets/LocalLLaMA/typed-decisions#what-a-score-here-means) reports 73.5% agreement
+between sampled teacher outputs and describes approximately 75% as saturation for that labelling setup. Those are
+dataset reference measurements, not a measured upper bound on Primus or on future application accuracy. Primus's
+75.1% is one recorded result for the released checkpoint on this test. The invoice study separately evaluates
+arithmetic and membership labels. The 195-case validation split supported model selection and calibration; the
+sealed test provides the release result. The reported bootstrap intervals measure case-sampling uncertainty for
+this frozen ensemble, with one seed per member. [Research FAQ](RESEARCH_FAQ.md) explains these distinctions.
 
 ## Calibration and operation
 

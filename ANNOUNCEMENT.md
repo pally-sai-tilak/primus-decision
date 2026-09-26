@@ -7,8 +7,8 @@ probability distribution: is a statement true, which of these options applies, w
 an ensemble of a diagonal state-space (S4D) encoder and a bidirectional GRU with LSA case features, 3,715,074 neural
 parameters in total, and it runs on a CPU at about 140 ms per five-decision case (115–162 ms across recorded runs; method and every run in `EXPERIMENTS.md`).
 
-We evaluated it once on the sealed official test split of `LocalLLaMA/typed-decisions`, after freezing the
-architecture, hyper-parameters and calibration, under a release rule written before the split was read:
+The release result comes from one sealed evaluation on the official test split of `LocalLLaMA/typed-decisions`, after
+freezing the architecture, hyper-parameters and calibration. The evaluation covers 400 cases and 2,000 decisions:
 
 ```
 Primus Decision 0.1
@@ -29,7 +29,7 @@ representations, every comparison system and raw predictions alongside the study
 
 The release contains the exact frozen bytes with checksums, a minimal inference runtime with a runnable example, the
 model card, the full benchmark tables, scope and evaluation notes, the evaluation protocol, reproduction instructions, and a
-behavioral-equivalence record showing the public package matching our internal frozen model bit for bit. Exact
+behavioral-equivalence record showing the public package matching our internal frozen model bit for bit on a 600-decision fixture. Exact
 parameter counts, package sizes and the runtime footprint are in `MODEL_SIZE_AND_PARAMETERS.md`.
 
 This is our first public component in a longer Primus research programme. We publish evidence for the released

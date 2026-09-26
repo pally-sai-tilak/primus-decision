@@ -27,14 +27,15 @@ the validation metrics in `PROVENANCE.json` and the sealed numbers in section 6 
 sha256 `4752590be05d1f40be378eb21cd0b42b75877b2b5262eddf59892f93c2cc02d1`. Official `train` split (1,200 cases /
 6,000 decisions; file sha256 `46a58d63edfd86e23229c78afe8b72307bb4ca9fb0e8df180cabb3c67ec9dcd5`) for fitting and
 validation; official `test` split (400 cases / 2,000 decisions; file sha256
-`4f294f218ea1da27f3efef936359389c62ea4d3973a41457732990f1d31b647c`) read exactly once, sealed. Validation rule:
+`4f294f218ea1da27f3efef936359389c62ea4d3973a41457732990f1d31b647c`) used for one sealed release evaluation. Later verification and diagnostic uses are recorded in `EXPERIMENTS.md`. Validation rule:
 `int(sha256(case_id.encode()).hexdigest(), 16) % 100 < 20` (195 cases), the rest is the training part (1,005 cases). No seed, no shuffling.
 Full protocol: `PROTOCOL.md`.
 
 ## 4. How the members were trained
 
-The training code is not part of this release. This is its configuration, enough to reimplement it against the
-runtime's model definition (`primus_decision/nn.py`) and text pipeline (`primus_decision/data.py`).
+The public runtime defines the networks (`primus_decision/nn.py`) and text pipeline (`primus_decision/data.py`);
+the configuration below documents the recorded training setup for researchers implementing their own training run.
+The original training pipeline remains private. Public inference can be reproduced from the shipped artifacts.
 
 | setting | `member0` (S4D) | `member1` (GRU) |
 |---|---|---|

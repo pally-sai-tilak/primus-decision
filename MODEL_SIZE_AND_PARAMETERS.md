@@ -22,7 +22,7 @@ Checkpoint tensors match the instantiated networks exactly: 61 tensors / 1,932,6
 
 ## 2. Learned statistical artifacts (not neural parameters)
 
-Each member carries an LSA featurizer: a word 1–2-gram TF-IDF vectorizer, a character 3–5-gram TF-IDF vectorizer and a truncated SVD fitted on the training split, plus per-dimension mean and standard deviation. These are fitted tables, not trained weights, so they are reported here and excluded from the parameter count.
+Each member carries an LSA featurizer: a word 1–2-gram TF-IDF vectorizer, a character 3–5-gram TF-IDF vectorizer and a truncated SVD fitted on the training split, plus per-dimension mean and standard deviation. These are non-neural learned coefficients, reported separately from the neural parameter count.
 
 | member | word n-gram vocabulary | char n-gram vocabulary | SVD dims | component matrix | matrix dtype | matrix bytes | file |
 |---|---|---|---|---|---|---|---|
@@ -31,7 +31,9 @@ Each member carries an LSA featurizer: a word 1–2-gram TF-IDF vectorizer, a ch
 
 The embedding table of each member has 4,819 rows: the words listed in `model/member*/vocab.json` plus the hash buckets for unknown tokens and padding.
 
-## 3. Package size (this release tree, real bytes; the two `lsa.pkl` files are stored as Git LFS objects of exactly these sizes, not pointer files)
+## 3. Original version 0.1 release artifacts
+
+These exact package counts describe the original version 0.1 release archives. Subsequent documentation and evidence additions on the repository's main branch do not change the model artifacts. The two `lsa.pkl` payloads are Git LFS objects; the table counts their real bytes rather than pointer files.
 
 | part | bytes | decimal | binary |
 |---|---|---|---|
@@ -41,7 +43,7 @@ The embedding table of each member has 4,819 rows: the words listed in `model/me
 | documentation, manifests, checksums, license | 158,471 | 0.16 MB | 0.15 MiB |
 | **total raw package size (installed)** | **157,969,312** | **157.97 MB** | **150.65 MiB** |
 
-Download: `primus-decision-0.1.tar.gz` is 114.5 MB (gzip; the zip is within 0.1 MB of it). Both archives are built from exactly this tree with fixed timestamps. The archives, their exact byte counts and SHA-256 (`DOWNLOAD_CHECKSUMS.txt`) are on the GitHub release page for tag `primus-decision-0.1`, not in the repository; an archive cannot carry its own checksum. A git clone transfers the same 142.8 MB of LFS objects plus the compressed git objects of the remaining 15.1 MB.
+Download: `primus-decision-0.1.tar.gz` is 114.5 MB (gzip; the zip is within 0.1 MB of it). Both archives were built from the original version 0.1 release tree with fixed timestamps. The archives, their exact byte counts and SHA-256 (`DOWNLOAD_CHECKSUMS.txt`) are on the GitHub release page for tag `primus-decision-0.1`, not in the repository; an archive cannot carry its own checksum. A git clone transfers the same 142.8 MB of LFS objects plus the compressed git objects of the remaining 15.1 MB.
 
 ## 4. Runtime footprint (release test machine, CPU only)
 

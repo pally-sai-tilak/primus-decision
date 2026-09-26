@@ -12,7 +12,7 @@ per five-decision case (115–162 ms across recorded runs; `EXPERIMENTS.md`).
 
 ## Result
 
-Evaluated once on the sealed official test split of `LocalLLaMA/typed-decisions`, 400 cases and 2,000 decisions,
+One sealed evaluation of the frozen model on the official test split of `LocalLLaMA/typed-decisions`, 400 cases and 2,000 decisions,
 raw probabilities:
 
 ```
@@ -49,7 +49,7 @@ The 143 MB of fitted LSA features are additional learned state, separate from th
 
 ## Invoice research
 
-The unchanged public component scores **26/32 structured reconciliation checks** in a broader synthetic invoice test,
+Using its released weights without retraining, Primus scores **26/32 structured reconciliation checks** in a broader synthetic invoice test,
 following **32/32** in the initial pilot. The study publishes both input representations, duplicate-ID checks,
 all comparison systems and an audit of Qwen answer formats. [Read the case study and evidence](INVOICE_CASE_STUDY.md).
 
@@ -61,10 +61,10 @@ inference, and a memory footprint set by the featurizers rather than the network
 ## How it was evaluated
 
 Training used the official train split only: 1,005 cases for fitting, 195 held out for validation by a fixed hash
-rule. The release rule was committed before the test split was read: primary gate accuracy above the reference,
-secondary gate Brier or raw ECE below it. Architecture, hyper-parameters and calibration were frozen with content
-hashes; the test split was opened once. Primary failed, secondary passed. Protocol in `PROTOCOL.md`, machine record in
-`SEALED_RESULT.json`.
+rule. Model, calibration and protocol were frozen before the sealed evaluation. The predeclared comparison rule required accuracy above Laya's published 76.6% plus an improvement in Brier or raw
+ECE for a broad superiority claim. Primus recorded 75.1% accuracy, Brier 0.059 and raw ECE 0.127. It is published as
+the research alpha provided for in that protocol, with each measured capability and comparison reported explicitly.
+Protocol: `PROTOCOL.md`; machine record: `SEALED_RESULT.json`.
 
 ## Evaluation conditions
 
@@ -73,9 +73,9 @@ calibration choices, validation sample size and runtime footprint are documented
 
 ## Verify and reproduce
 
-`REPRODUCIBILITY.md` covers checksum verification, the environment, the dataset revision, retraining, the sealed
+`REPRODUCIBILITY.md` covers checksum verification, the environment, the dataset revision, the recorded training setup, the sealed
 evaluation and inference. `MODEL_SIZE_AND_PARAMETERS.md` has the exact parameter counts, package sizes and footprint,
-and `BEHAVIORAL_EQUIVALENCE.md` shows the public package matching the internal frozen one bit for bit.
+and `BEHAVIORAL_EQUIVALENCE.md` shows the public package matching the internal frozen one bit for bit on a 600-decision fixture.
 
 ## Context
 

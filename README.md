@@ -2,16 +2,19 @@
 
 **Decisions, not generations.**
 
-A 3.7M-parameter open non-transformer model for typed probabilistic decisions.
+An open non-transformer model for typed probabilistic decisions, with 3.7M neural parameters, fitted LSA features and local CPU inference.
 
 [![verify](https://github.com/pally-sai-tilak/primus-decision/actions/workflows/verify.yml/badge.svg)](https://github.com/pally-sai-tilak/primus-decision/actions/workflows/verify.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![release](https://img.shields.io/github/v/tag/pally-sai-tilak/primus-decision?label=release)](https://github.com/pally-sai-tilak/primus-decision/releases)
-[![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](requirements.txt)
+[![python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](requirements.txt)
 
-The first trained model component of Primus: a non-transformer typed-decision research model. Primus is the AI
-research program of [AAME](https://theaame.com); this repository is its first public model release, **Primus
-Decision 0.1 — Research Alpha**.
+Primus Decision 0.1 is [AAME](https://theaame.com)'s first public research alpha: a non-transformer model that returns
+probabilities for typed questions over a supplied state. Its released inference path runs locally on CPU without an
+LLM call. It is the first published decision component in the broader Primus research programme.
+
+[Research FAQ](RESEARCH_FAQ.md) · [Model on Hugging Face](https://huggingface.co/The-Aame/primus-decision-0.1) ·
+[AAME research](https://theaame.com/primus)
 
 Give it a JSON state (an invoice, a support thread, a security alert, an agent trace) and a typed question, and it
 returns a probability distribution over the answers instead of generated text:
@@ -22,8 +25,8 @@ returns a probability distribution over the answers instead of generated text:
 | `choice` | which of these options applies? | one probability per option |
 | `score` | which level on an ordinal scale? | one probability per level, plus the expected level |
 
-**Key result.** Official test split of `LocalLLaMA/typed-decisions` (400 cases, 2,000 decisions), read once after the
-model was frozen, raw probabilities:
+**Key result.** One sealed evaluation of the frozen model on the official test split of
+`LocalLLaMA/typed-decisions` (400 cases, 2,000 decisions), raw probabilities:
 
 ```
 Primus Decision 0.1
@@ -42,7 +45,7 @@ of the two models on this benchmark; full results and measurement conditions fol
 
 ## Invoice case study
 
-The unchanged public model answered **26/32 structured reconciliation questions correctly (81.25%)** in a broader
+Using its released weights without retraining, Primus answered **26/32 structured reconciliation questions correctly (81.25%)** in a broader
 synthetic invoice experiment, following **32/32** in the initial pilot. Qwen3-1.7B was evaluated as a standalone
 competitor, alongside a TF-IDF classifier and explicit rules. The broader classifier result is 27/32; Primus's
 narrative result on the same invoice facts is 17/32. All tasks, formats and comparison results are published together.
@@ -57,7 +60,7 @@ original 75.1% Typed Decisions benchmark.
 |---|---|
 | neural parameters | 3,715,074: 1,932,609 in the S4D member and 1,782,465 in the GRU member; both run on every prediction |
 | other learned state | two LSA featurizers (word and character TF-IDF with a 256-d truncated SVD), 71.4 MB each |
-| download / installed | 114.5 MB `.tar.gz` / 157.9 MB, of which 142.8 MB are the featurizers |
+| original release download / installed | 114.5 MB `.tar.gz` / 157.9 MB, of which 142.8 MB are the featurizers |
 | CPU latency (one five-decision case, model loaded, 2 threads) | p50 about 140 ms; 115–162 ms across six runs with two methods on the same machine class ([Latency and memory](#latency-and-memory)) |
 | throughput | 20–34 cases (100–171 decisions) per second over the whole test split with 2 threads |
 | memory | 0.5–0.6 GB resident after loading; 1.4–1.6 GB peak during inference, almost all of it the featurizers |
@@ -74,7 +77,7 @@ python -m pip install -r requirements.txt --index-url https://download.pytorch.o
 python examples/predict_example.py    # one invoice, three questions, raw probabilities
 ```
 
-Python 3.10 or newer; CPU only. The `--index-url` option installs the CPU build of torch (about 200 MB); without it,
+Python 3.11 or newer; CPU only. The `--index-url` option installs the CPU build of torch (about 200 MB); without it,
 PyPI serves the CUDA build with several GB of dependencies that this model does not use. Take the model from a clone
 with Git LFS or from `primus-decision-0.1.tar.gz` on the release page of tag `primus-decision-0.1`; the archive GitHub
 generates for the tag ("Source code") holds LFS pointer files instead of the featurizers, and loading one of those
@@ -121,9 +124,10 @@ the same shapes, `{"calibrated": true}` to apply the optional temperature profil
 
 The released interface supports 20 question schemas, identified by workflow and question ID and listed under
 `schemas` in `model/member0/config.json`: five questions in each of agent-trace observability, customer service,
-invoice processing and security incidents. For a supported `choice` question, K supplied options produce a K-way
-distribution, so a new option set needs no new output head. Requests outside the supported schemas receive an
-explicit validation error.
+invoice processing and security incidents. For a supported `choice` question, the request can select and reorder
+trained option keys and supply their descriptions; K supplied supported keys produce a K-way distribution. The keys
+available for each schema are listed under `schema_options` in the model configuration. The runtime validates the
+question schema and looks up its trained option keys before inference.
 
 ## Architecture
 
@@ -204,8 +208,10 @@ the model already loaded; the case is one five-decision test case at a time. Two
 
 Four cold-start probe runs with a second method on the same machine class (`MODEL_SIZE_AND_PARAMETERS.md`) measured p50
 128–162 ms, 39–65 ms per case at batch 32 and peak 1,403 MB. Over all six runs the p50 is 115–162 ms, about 140 ms in the
-middle, so treat any single figure as ±25 %. Laya's released checkpoint on the same machine (reproduced by us, 4 threads)
-needs 3,291 ms per case and 3,029 MB at peak, 20–29x the Primus figures. Reproduce the method on your hardware with
+middle, so the recorded spread is approximately ±25 %. Reproduced Laya used 4 CPU threads on the same machine and
+recorded 3,291 ms per case, compared with Primus's observed 115–162 ms using 2 threads. That is a 20–29× difference
+in these per-case latency measurements. Peak memory was 3,029 MB for Laya and 1,403–1,563 MB across the Primus runs.
+Reproduce the method on your hardware with
 `python examples/measure_latency.py --parquet <official test split parquet>`; every recorded run is listed in
 `EXPERIMENTS.md`.
 
@@ -243,12 +249,12 @@ features. Calibration choices, input conventions and operational details are col
 - **Verify the bytes.** `sha256sum -c SHA256SUMS` checks every file; `PROVENANCE.json` holds the hash of every model
   file as frozen before the sealed run, the dataset revision and file hashes, the training configuration of each member,
   the validation metrics and the environment.
-- **The sealed protocol.** The release rule was written before the test split was opened: accuracy above the reference
-  as the primary gate, Brier or raw ECE below it as the secondary. Architecture, hyper-parameters and calibration were
-  frozen with content hashes; the test split was read exactly once. The primary gate failed and the secondary passed,
-  which is why this ships as a research alpha with the gap stated (`PROTOCOL.md`).
+- **The sealed protocol.** Model, calibration and protocol were frozen before the release evaluation. The historical
+  comparison rule and its outcome are recorded in [the evaluation protocol](PROTOCOL.md) and
+  [benchmark record](BENCHMARKS.md#release-gate-computed-by-the-sealed-runner). Later verification and diagnostic
+  measurements remain separately identified.
 - **Expected numbers.** Raw: accuracy 0.751, soft accuracy 0.563, Brier 0.059, ECE 0.127, NLL 0.637, score MAE 0.275,
-  within-1 0.984, KL 0.102. An independent implementation of the metrics on a fresh run of the hash-checked bytes
+  within-1 0.984, KL 0.102. A separately implemented metric calculation on a fresh run of the hash-checked bytes
   reproduces every cell of the recorded result to 1e-16 (`EXPERIMENTS.md`).
 - **Retraining.** The training code is not part of this release; `REPRODUCIBILITY.md` gives the full configuration of
   both members (seeds, widths, losses, optimiser, schedule, early stopping, calibration) against the runtime's model
@@ -270,13 +276,15 @@ bytes unchanged (`RELEASE_NOTES.md`).
 
 `INTERFACE.md` and `schemas/` specify the three JSON shapes the model reads and writes: the request (one state, typed
 questions), the response (one distribution per question with its confidence and type-specific summary) and the
-**Decision History** record, an append-only log of what was asked, what was answered and what turned out to be right,
-built for auditing decisions, replaying them against a later model version and measuring calibration in production.
+**Decision History** schema, a record format for what was asked, what was answered and a later observed outcome.
+It is designed for applications to audit decisions, replay them against a later model version and measure calibration;
+the integrating application supplies the log storage.
 
 ## Repository contents
 
 | file | purpose |
 |---|---|
+| `RESEARCH_FAQ.md` | release capabilities, benchmark interpretation, adaptation and broader research direction |
 | `INVOICE_CASE_STUDY.md`, `INVOICE_EVIDENCE.md` | invoice case study, evidence download and reproduction guide |
 | `model/` | the frozen bytes: `ensemble.json`, `member0/` (S4D), `member1/` (GRU), calibration profiles |
 | `primus_decision/` | the inference runtime: text pipeline, featurizer, networks, ensemble, calibration, metrics, request handling, JSON-lines bridge |
@@ -284,7 +292,7 @@ built for auditing decisions, replaying them against a later model version and m
 | `INTERFACE.md`, `schemas/` | request, response and Decision History shapes as JSON Schemas |
 | `MODEL_CARD.md` | scope, results, model, intended use, provenance |
 | `BENCHMARKS.md`, `SEALED_RESULT.json` | the sealed run, per workflow and per question type, with the published references |
-| `EXPERIMENTS.md` | every measurement made on the frozen model after the sealed run, with its evidence class and method |
+| `EXPERIMENTS.md` | recorded post-release benchmark analyses, with their evidence class and method |
 | `MODEL_SIZE_AND_PARAMETERS.md` | exact parameter counts, sizes and the probe footprint |
 | `LIMITATIONS.md` | supported scope, input conventions and evaluation conditions |
 | `PROTOCOL.md` | evaluation protocol and the release rule, written before the test split was read |

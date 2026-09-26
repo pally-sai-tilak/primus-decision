@@ -1,7 +1,8 @@
 # Benchmarks — Primus Decision 0.1 (Research Alpha)
 
 Benchmark: `LocalLLaMA/typed-decisions` (revision `ea9306458d6e9563628369a3d1e72e362fb381d2`), official **test** split,
-400 cases / 2,000 decisions, evaluated exactly once after freezing (`SEALED_RESULT.json`, sealed run #1).
+400 cases / 2,000 decisions, one sealed release evaluation after freezing (`SEALED_RESULT.json`, sealed run #1).
+Later verification and robustness analyses are documented separately in `EXPERIMENTS.md`; they did not change the released weights or replace the sealed result.
 Protocol and metric definitions: `PROTOCOL.md` (bundled). Mode: specialist (same as Laya-typed-decisions).
 
 | Model | accuracy | soft acc | Brier | ECE | score MAE | within-1 | KL |
@@ -38,13 +39,14 @@ Laya's calibrated ECE (≈0.081) is a family-level post-temperature figure from 
 
 | workflow | accuracy (raw) | ECE (raw) | ECE (calibrated) | Laya accuracy | difference |
 |---|---|---|---|---|---|
-| agent_trace_observability | 0.732 | 0.160 | 0.036 | 0.730 | +0.002 (1 decision in 500: a tie) |
+| agent_trace_observability | 0.732 | 0.160 | 0.036 | 0.730 | +0.002 (1 additional matching decision in 500) |
 | customer_service | 0.728 | 0.112 | 0.070 | 0.764 | −0.036 |
-| invoice_processing | 0.808 | 0.097 | 0.044 | 0.804 | +0.004 (2 decisions in 500: a tie) |
+| invoice_processing | 0.808 | 0.097 | 0.044 | 0.804 | +0.004 (2 additional matching decisions in 500) |
 | security_incidents | 0.736 | 0.145 | 0.047 | 0.766 | −0.030 |
 
-With 500 decisions per workflow the standard error of an accuracy is about 2 points, so the two positive differences
-are ties, not wins; the two negative ones are losses.
+Each workflow has 100 cases and 500 related decisions. The table reports observed differences on those cases.
+Comparative uncertainty should be estimated from paired predictions while preserving case grouping; the one- and
+two-decision differences above are not evidence of a broad performance advantage.
 
 ## By primitive
 

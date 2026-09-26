@@ -1,15 +1,15 @@
 # Model card — Primus Decision 0.1 (Research Alpha)
 
-**Positioning.** The first trained model component of Primus: a non-transformer typed-decision research model.
+**Positioning.** AAME's first public Primus research alpha: a non-transformer typed-decision model with 3.7M neural parameters, fitted LSA features and local CPU inference.
 
-**Scope.** This artifact is **Primus System 1**, the typed-decision component. It answers supported questions about
+**Scope.** Primus Decision 0.1 is the first public typed-decision component of Primus. It answers supported questions about
 one JSON state with probability distributions. Persistent memory, deliberation and tool orchestration belong to the
 broader research roadmap; the released interface evaluates each supplied state independently.
 
 ## Result
 
-Sealed official test split of `LocalLLaMA/typed-decisions`, 400 cases and 2,000 decisions, evaluated once after
-freezing, raw probabilities:
+One sealed evaluation after freezing, on the official test split of `LocalLLaMA/typed-decisions`,
+400 cases and 2,000 decisions, raw probabilities:
 
 ```
 Primus Decision 0.1
@@ -38,7 +38,7 @@ for the full comparisons, including the externally reported meraGPT result (accu
 
 ## Invoice case study
 
-The unchanged model scored **26/32 on structured reconciliation** in the broader synthetic invoice experiment and
+Using its released weights without retraining, Primus scored **26/32 on structured reconciliation** in the broader synthetic invoice experiment and
 **32/32 in the initial pilot**. The broader study also records 17/32 on the narrative presentation of the same facts,
 alongside classifier, rule and standalone Qwen3-1.7B comparisons. Read the
 [complete case study and evidence](INVOICE_CASE_STUDY.md). These are separate task-specific experiments.
@@ -54,12 +54,13 @@ vector, additive attention pooling conditioned on the question, and an option sc
 | `model/member1` | 2 bidirectional GRU layers, d = 192 | 1,782,465 |
 
 That is 3,715,074 neural parameters in total, all of them used on every prediction because both members run each
-time. Each member also carries an LSA featurizer (word and character TF-IDF plus a 256-d truncated SVD fitted on the
-training split), which is a learned statistical table rather than trained weights: 71 MB each on disk and the reason
-the package is 158 MB rather than 15 MB. Exact counts, sizes and measurements: `MODEL_SIZE_AND_PARAMETERS.md`.
+time. Each member also includes fitted TF-IDF/LSA coefficients, including a 256-d truncated SVD fitted on the training
+split. These are non-neural learned state, reported separately from the neural parameter count: approximately 71 MB
+per member and 143 MB together in the original 158 MB package. Neural weight files total approximately 15 MB.
+Exact counts, sizes and measurements: `MODEL_SIZE_AND_PARAMETERS.md`.
 
 - **Question types.** `noul` gives the probability that a statement is true; `choice` a distribution over the
-  supplied options; `score` a distribution over ordinal levels plus its expected value. The number of options is not fixed.
+  supplied supported option keys; `score` a distribution over ordinal levels plus its expected value. A `choice` request can select and reorder the schema's trained option keys and supply their descriptions; `schema_options` in the model configuration lists those keys.
 - **Inputs.** The state flattened to text, deterministic derived-relation sentences (numeric comparisons within a
   key family, list membership, signs, nulls), the question instructions and the option criteria.
 - **Training data.** The official train split only, 1,005 cases for fitting and 195 held out as validation by a
@@ -84,10 +85,10 @@ model or schema coverage where needed. Use human review for consequential decisi
 
 ## Evaluation protocol
 
-`PROTOCOL.md` describes the fixed train/validation hash split, the once-only sealed read of the test split, the
-metric definitions (the same conventions as the published Laya evaluation) and the release rule, which was written
-down before the test split was opened. The rule's primary gate, accuracy above the reference, failed; the secondary
-gate, Brier or ECE below the reference, passed. That is why this is a research alpha.
+`PROTOCOL.md` records the fixed train/validation hash split, metric definitions and comparison rule written before
+the sealed evaluation. The predeclared comparison rule required accuracy above Laya's published 76.6% plus an improvement in Brier or raw
+ECE for a broad superiority claim. Primus recorded 75.1% accuracy, Brier 0.059 and raw ECE 0.127. It is published as
+the research alpha provided for in that protocol, with each measured capability and comparison reported explicitly.
 
 ## Reproduction and provenance
 
@@ -108,4 +109,4 @@ associated logos are trademarks of Pally Sai Tilak / AAME and are not licensed. 
 ## Broader Primus programme
 
 The released decision component is the first public research alpha. The longer-term architecture and the boundary
-between auditable public evidence and protected research are described in [Public boundary](PUBLIC_BOUNDARY.md).
+between auditable public evidence and protected research are described in [Public boundary](PUBLIC_BOUNDARY.md) and the [Research FAQ](RESEARCH_FAQ.md).
