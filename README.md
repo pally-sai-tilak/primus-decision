@@ -219,7 +219,7 @@ Reproduce the method on your hardware with
 
 Measured on the test split with synthetic rewrites of the inputs (2,000 decisions each unless stated):
 
-- **Option order:** exactly invariant. Shuffling the options of every `choice` question changes no decision and moves no
+- **Option order:** every recorded answer is preserved. Shuffling the options of every `choice` question changes no decision and moves no
   probability by more than 4e-8.
 - **Wording:** paraphrased instructions −0.1 point (96.7 % of decisions keep their answer); synonyms in the state −0.1;
   long or US date formats −0.4 and −0.5; three or five added noise fields −0.8 and −1.1; a different nesting layout −1.3;
